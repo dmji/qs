@@ -38,3 +38,17 @@ type unmarshalerCache struct {
 func (o *unmarshalerCache) Unmarshaler(t reflect.Type, opts *UnmarshalOptions) (Unmarshaler, error) {
 	return cacher(o.wrapped.Unmarshaler, &o.cache, t, opts)
 }
+
+func (p *unmarshalerCache) RegisterSubFactory(k reflect.Kind, fn UnmarshalerFactoryFunc) error {
+	return p.wrapped.RegisterSubFactory(k, fn)
+
+}
+
+func (p *unmarshalerCache) RegisterCustomType(k reflect.Type, fn PrimitiveUnmarshalerFunc) error {
+	return p.wrapped.RegisterCustomType(k, fn)
+
+}
+
+func (p *unmarshalerCache) RegisterKindOverride(k reflect.Kind, fn PrimitiveUnmarshalerFunc) error {
+	return p.wrapped.RegisterKindOverride(k, fn)
+}

@@ -22,3 +22,17 @@ func (f *unmarshalerFactory) Unmarshaler(t reflect.Type, opts *qs.UnmarshalOptio
 		return f.orig.Unmarshaler(t, opts)
 	}
 }
+
+func (p *unmarshalerFactory) RegisterSubFactory(k reflect.Kind, fn qs.UnmarshalerFactoryFunc) error {
+	panic("!mock not implemented!")
+
+}
+
+func (p *unmarshalerFactory) RegisterCustomType(k reflect.Type, fn qs.PrimitiveUnmarshalerFunc) error {
+	panic("!mock not implemented!")
+
+}
+
+func (p *unmarshalerFactory) RegisterKindOverride(k reflect.Kind, fn qs.PrimitiveUnmarshalerFunc) error {
+	panic("!mock not implemented!")
+}
