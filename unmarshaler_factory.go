@@ -61,6 +61,25 @@ func newValuesUnmarshalerFactory() ValuesUnmarshalerFactory {
 	}
 }
 
+// valuesUnmarshalerFactoryFunc implements the UnmarshalerFactory interface.
+type valuesUnmarshalerFactoryFunc func(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error)
+
+func (f valuesUnmarshalerFactoryFunc) ValuesUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error) {
+	return f(t, opts)
+}
+
+type valuesUnmarshalerFactory struct {
+	KindSubRegistries map[reflect.Kind]ValuesUnmarshalerFactory
+}
+
+func (p *valuesUnmarshalerFactory) ValuesUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error) {
+	if subFactory, ok := p.KindSubRegistries[t.Kind()]; ok {
+		return subFactory.ValuesUnmarshaler(t, opts)
+	}
+
+	return nil, &unhandledTypeError{Type: t}
+}
+
 func newUnmarshalerFactory() UnmarshalerFactory {
 	return &unmarshalerFactory{
 		Types: map[reflect.Type]Unmarshaler{
@@ -94,18 +113,6 @@ func newUnmarshalerFactory() UnmarshalerFactory {
 	}
 }
 
-type valuesUnmarshalerFactory struct {
-	KindSubRegistries map[reflect.Kind]ValuesUnmarshalerFactory
-}
-
-func (p *valuesUnmarshalerFactory) ValuesUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error) {
-	if subFactory, ok := p.KindSubRegistries[t.Kind()]; ok {
-		return subFactory.ValuesUnmarshaler(t, opts)
-	}
-
-	return nil, &unhandledTypeError{Type: t}
-}
-
 // unmarshalerFactory implements the UnmarshalerFactory interface.
 type unmarshalerFactory struct {
 	Types             map[reflect.Type]Unmarshaler
@@ -120,7 +127,7 @@ func (p *unmarshalerFactory) Unmarshaler(t reflect.Type, opts *UnmarshalOptions)
 		return unmarshaler, nil
 	}
 
-	if reflect.PtrTo(t).Implements(unmarshalQSInterfaceType) {
+	if reflect.PointerTo(t).Implements(unmarshalQSInterfaceType) {
 		return unmarshalerFunc(unmarshalWithUnmarshalQS), nil
 	}
 
@@ -133,13 +140,6 @@ func (p *unmarshalerFactory) Unmarshaler(t reflect.Type, opts *UnmarshalOptions)
 	}
 
 	return nil, &unhandledTypeError{Type: t}
-}
-
-// valuesUnmarshalerFactoryFunc implements the UnmarshalerFactory interface.
-type valuesUnmarshalerFactoryFunc func(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error)
-
-func (f valuesUnmarshalerFactoryFunc) ValuesUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error) {
-	return f(t, opts)
 }
 
 // unmarshalerFactoryFunc implements the UnmarshalerFactory interface.

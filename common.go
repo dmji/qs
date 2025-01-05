@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"reflect"
 	"strings"
+	"sync"
 	"time"
 	"unicode"
 )
@@ -28,8 +29,7 @@ type parsedTag struct {
 	UnmarshalPresence UnmarshalPresence
 }
 
-func getStructFieldInfo(field reflect.StructField, nt NameTransformFunc, defaultMarshalPresence MarshalPresence,
-	defaultUnmarshalPresence UnmarshalPresence) (skip bool, tag parsedTag, err error) {
+func getStructFieldInfo(field reflect.StructField, nt NameTransformFunc, defaultMarshalPresence MarshalPresence, defaultUnmarshalPresence UnmarshalPresence) (skip bool, tag parsedTag, err error) {
 	// Skipping unexported fields.
 	if field.PkgPath != "" && !field.Anonymous {
 		skip = true
@@ -55,21 +55,20 @@ func getStructFieldInfo(field reflect.StructField, nt NameTransformFunc, default
 	return
 }
 
-func parseFieldTag(tagStr reflect.StructTag, defaultMarshalPresence MarshalPresence,
-	defaultUnmarshalPresence UnmarshalPresence) (tag parsedTag, err error) {
+func parseFieldTag(tagStr reflect.StructTag, defaultMarshalPresence MarshalPresence, defaultUnmarshalPresence UnmarshalPresence) (tag parsedTag, err error) {
 	v := tagStr.Get(tagKey)
 	arr := strings.Split(v, ",")
 	tag.Name = arr[0]
 
 	setMarshalPresence := func(v MarshalPresence) {
-		if tag.MarshalPresence != MPUnspecified {
+		if tag.MarshalPresence != MarshalPresenceMPUnspecified {
 			err = fmt.Errorf("only one MarshalPresence option is allwed - you've specified at least two: %v, %v", tag.MarshalPresence, v)
 		}
 		tag.MarshalPresence = v
 	}
 
 	setUnmarshalPresence := func(v UnmarshalPresence) {
-		if tag.UnmarshalPresence != UPUnspecified {
+		if tag.UnmarshalPresence != UnmarshalPresenceUPUnspecified {
 			err = fmt.Errorf("only one UnmarshalPresence option is allwed - you've specified at least two: %v, %v", tag.UnmarshalPresence, v)
 		}
 		tag.UnmarshalPresence = v
@@ -78,15 +77,15 @@ func parseFieldTag(tagStr reflect.StructTag, defaultMarshalPresence MarshalPrese
 	for _, option := range arr[1:] {
 		switch option {
 		case "nil":
-			setUnmarshalPresence(Nil)
+			setUnmarshalPresence(UnmarshalPresenceNil)
 		case "opt":
-			setUnmarshalPresence(Opt)
+			setUnmarshalPresence(UnmarshalPresenceOpt)
 		case "req":
-			setUnmarshalPresence(Req)
+			setUnmarshalPresence(UnmarshalPresenceReq)
 		case "keepempty":
-			setMarshalPresence(KeepEmpty)
+			setMarshalPresence(MarshalPresenceKeepEmpty)
 		case "omitempty":
-			setMarshalPresence(OmitEmpty)
+			setMarshalPresence(MarshalPresenceOmitEmpty)
 		case "":
 			err = errors.New("tag string contains a surplus comma")
 		default:
@@ -97,10 +96,10 @@ func parseFieldTag(tagStr reflect.StructTag, defaultMarshalPresence MarshalPrese
 		}
 	}
 
-	if tag.MarshalPresence == MPUnspecified {
+	if tag.MarshalPresence == MarshalPresenceMPUnspecified {
 		tag.MarshalPresence = defaultMarshalPresence
 	}
-	if tag.UnmarshalPresence == UPUnspecified {
+	if tag.UnmarshalPresence == UnmarshalPresenceUPUnspecified {
 		tag.UnmarshalPresence = defaultUnmarshalPresence
 	}
 
@@ -127,4 +126,25 @@ func snakeCase(s string) string {
 	}
 
 	return string(out)
+}
+
+func cacher[TRes any, TOpt any](wrapped func(t reflect.Type, opts *TOpt) (TRes, error), cache *sync.Map, t reflect.Type, opts *TOpt) (TRes, error) {
+	var (
+		m   TRes
+		err error
+	)
+	if item, ok := cache.Load(t); ok {
+		if m, ok = item.(TRes); ok {
+			return m, nil
+		}
+		return m, item.(error)
+	}
+
+	m, err = wrapped(t, opts)
+	if err != nil {
+		cache.Store(t, err)
+	} else {
+		cache.Store(t, m)
+	}
+	return m, err
 }

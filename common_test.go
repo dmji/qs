@@ -16,17 +16,17 @@ type defaultPresenceTestCase struct {
 
 func TestParseTag_DefaultPresence(t *testing.T) {
 	testCases := []defaultPresenceTestCase{
-		{`qs:"name"`, KeepEmpty, KeepEmpty, Nil, Nil},
-		{`qs:"name"`, OmitEmpty, OmitEmpty, Opt, Opt},
-		{`qs:"name"`, OmitEmpty, OmitEmpty, Req, Req},
-		{`qs:"name,omitempty"`, KeepEmpty, OmitEmpty, Nil, Nil},
-		{`qs:"name,keepempty"`, KeepEmpty, KeepEmpty, Nil, Nil},
-		{`qs:"name,omitempty"`, OmitEmpty, OmitEmpty, Nil, Nil},
-		{`qs:"name,keepempty"`, OmitEmpty, KeepEmpty, Nil, Nil},
-		{`qs:"name,nil"`, KeepEmpty, KeepEmpty, Opt, Nil},
-		{`qs:"name,opt"`, KeepEmpty, KeepEmpty, Nil, Opt},
-		{`qs:"name,req"`, KeepEmpty, KeepEmpty, Nil, Req},
-		{`qs:"name,keepempty,opt"`, OmitEmpty, KeepEmpty, Nil, Opt},
+		{`qs:"name"`, MarshalPresenceKeepEmpty, MarshalPresenceKeepEmpty, UnmarshalPresenceNil, UnmarshalPresenceNil},
+		{`qs:"name"`, MarshalPresenceOmitEmpty, MarshalPresenceOmitEmpty, UnmarshalPresenceOpt, UnmarshalPresenceOpt},
+		{`qs:"name"`, MarshalPresenceOmitEmpty, MarshalPresenceOmitEmpty, UnmarshalPresenceReq, UnmarshalPresenceReq},
+		{`qs:"name,omitempty"`, MarshalPresenceKeepEmpty, MarshalPresenceOmitEmpty, UnmarshalPresenceNil, UnmarshalPresenceNil},
+		{`qs:"name,keepempty"`, MarshalPresenceKeepEmpty, MarshalPresenceKeepEmpty, UnmarshalPresenceNil, UnmarshalPresenceNil},
+		{`qs:"name,omitempty"`, MarshalPresenceOmitEmpty, MarshalPresenceOmitEmpty, UnmarshalPresenceNil, UnmarshalPresenceNil},
+		{`qs:"name,keepempty"`, MarshalPresenceOmitEmpty, MarshalPresenceKeepEmpty, UnmarshalPresenceNil, UnmarshalPresenceNil},
+		{`qs:"name,nil"`, MarshalPresenceKeepEmpty, MarshalPresenceKeepEmpty, UnmarshalPresenceOpt, UnmarshalPresenceNil},
+		{`qs:"name,opt"`, MarshalPresenceKeepEmpty, MarshalPresenceKeepEmpty, UnmarshalPresenceNil, UnmarshalPresenceOpt},
+		{`qs:"name,req"`, MarshalPresenceKeepEmpty, MarshalPresenceKeepEmpty, UnmarshalPresenceNil, UnmarshalPresenceReq},
+		{`qs:"name,keepempty,opt"`, MarshalPresenceOmitEmpty, MarshalPresenceKeepEmpty, UnmarshalPresenceNil, UnmarshalPresenceOpt},
 	}
 
 	for _, tc := range testCases {
@@ -62,7 +62,7 @@ func TestParseTag_SurplusComma(t *testing.T) {
 		`qs:"name,,opt"`,
 	}
 	for _, tagStr := range tagStrList {
-		_, err := parseFieldTag(tagStr, KeepEmpty, Opt)
+		_, err := parseFieldTag(tagStr, MarshalPresenceKeepEmpty, UnmarshalPresenceOpt)
 		if err == nil {
 			t.Errorf("unexpected success - tag: %q", tagStr)
 			continue
@@ -91,7 +91,7 @@ func TestParseTag_IncompatibleOptions(t *testing.T) {
 		`qs:",omitempty,keepempty"`,
 	}
 	for _, tagStr := range tagStrList {
-		_, err := parseFieldTag(tagStr, KeepEmpty, Opt)
+		_, err := parseFieldTag(tagStr, MarshalPresenceKeepEmpty, UnmarshalPresenceOpt)
 		if err == nil {
 			t.Errorf("unexpected success - tag: %q", tagStr)
 			continue

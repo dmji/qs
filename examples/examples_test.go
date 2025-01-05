@@ -1,10 +1,12 @@
-package qs
+package qs_test
 
 import (
 	"fmt"
 	"net/url"
 	"reflect"
 	"sort"
+
+	"github.com/pasztorpisti/qs"
 )
 
 func ExampleMarshal() {
@@ -14,7 +16,7 @@ func ExampleMarshal() {
 		PageSize int
 	}
 
-	queryString, err := Marshal(&Query{
+	queryString, err := qs.Marshal(&Query{
 		Search:   "my search",
 		Page:     2,
 		PageSize: 50,
@@ -37,7 +39,7 @@ func ExampleMarshalValues() {
 	}
 
 	// values is a url.Values which is a map[string][]string
-	values, err := MarshalValues(&Query{
+	values, err := qs.MarshalValues(&Query{
 		Search:   "my search",
 		Page:     2,
 		PageSize: 50,
@@ -65,9 +67,9 @@ func ExampleMarshalValues() {
 func ExampleCheckMarshal() {
 	m := map[string]int{}
 
-	fmt.Println(CheckMarshal(0))
-	fmt.Println(CheckMarshal(m))
-	fmt.Println(CheckMarshal(&m))
+	fmt.Println(qs.CheckMarshal(0))
+	fmt.Println(qs.CheckMarshal(m))
+	fmt.Println(qs.CheckMarshal(&m))
 	// Output:
 	// unhandled type: int
 	// <nil>
@@ -78,9 +80,9 @@ func ExampleCheckMarshalType() {
 	intType := reflect.TypeOf(0)
 	mapType := reflect.TypeOf((map[string]int)(nil))
 
-	fmt.Println(CheckMarshalType(intType))
-	fmt.Println(CheckMarshalType(mapType))
-	fmt.Println(CheckMarshalType(reflect.PtrTo(mapType)))
+	fmt.Println(qs.CheckMarshalType(intType))
+	fmt.Println(qs.CheckMarshalType(mapType))
+	fmt.Println(qs.CheckMarshalType(reflect.PointerTo(mapType)))
 	// Output:
 	// unhandled type: int
 	// <nil>
@@ -90,9 +92,9 @@ func ExampleCheckMarshalType() {
 func ExampleCheckUnmarshal() {
 	m := map[string]int{}
 
-	fmt.Println(CheckUnmarshal(0))
-	fmt.Println(CheckUnmarshal(m))
-	fmt.Println(CheckUnmarshal(&m))
+	fmt.Println(qs.CheckUnmarshal(0))
+	fmt.Println(qs.CheckUnmarshal(m))
+	fmt.Println(qs.CheckUnmarshal(&m))
 	// Output:
 	// expected a pointer, got int
 	// expected a pointer, got map[string]int
@@ -103,9 +105,9 @@ func ExampleCheckUnmarshalType() {
 	intType := reflect.TypeOf(0)
 	mapType := reflect.TypeOf((map[string]int)(nil))
 
-	fmt.Println(CheckUnmarshalType(intType))
-	fmt.Println(CheckUnmarshalType(mapType))
-	fmt.Println(CheckUnmarshalType(reflect.PtrTo(mapType)))
+	fmt.Println(qs.CheckUnmarshalType(intType))
+	fmt.Println(qs.CheckUnmarshalType(mapType))
+	fmt.Println(qs.CheckUnmarshalType(reflect.PointerTo(mapType)))
 	// Output:
 	// expected a pointer, got int
 	// expected a pointer, got map[string]int
@@ -120,7 +122,7 @@ func ExampleUnmarshal() {
 	}
 
 	var q Query
-	err := Unmarshal(&q, "page=2&page_size=50&search=my+search")
+	err := qs.Unmarshal(&q, "page=2&page_size=50&search=my+search")
 
 	if err != nil {
 		fmt.Println(err)
@@ -139,7 +141,7 @@ func ExampleUnmarshalValues() {
 	}
 
 	var q Query
-	err := UnmarshalValues(&q, url.Values{
+	err := qs.UnmarshalValues(&q, url.Values{
 		"search":    {"my search"},
 		"page":      {"2"},
 		"page_size": {"50"},

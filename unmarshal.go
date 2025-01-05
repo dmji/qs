@@ -7,52 +7,6 @@ import (
 	"reflect"
 )
 
-// UnmarshalPresence is an enum that controls the unmarshaling of fields.
-// This option is used by the unmarshaler only if the given field isn't present
-// in the query string or url.Values that is being unmarshaled.
-type UnmarshalPresence int
-
-const (
-	// UPUnspecified is the zero value of UnmarshalPresence. In most cases
-	// you will use this implicitly by simply leaving the
-	// UnmarshalOptions.DefaultUnmarshalPresence field uninitialised which results
-	// in using the default UnmarshalPresence which is Opt.
-	UPUnspecified UnmarshalPresence = iota
-
-	// Opt tells the unmarshaler to leave struct fields as they are when they
-	// aren't present in the query string. However, nil pointers and arrays are
-	// created and initialised with new objects.
-	Opt
-
-	// Nil is the same as Opt except that it doesn't initialise nil pointers
-	// and slices during unmarshal when they are missing from the query string.
-	Nil
-
-	// Req tells the unmarshaler to fail with an error that can be detected
-	// using qs.IsRequiredFieldError if the given field is
-	// missing from the query string. While this is rather validation than
-	// unmarshaling it is practical to have this in case of simple programs.
-	// If you don't want to mix unmarshaling and validation then you can use the
-	// Nil option instead with nil pointers and nil arrays to be able to detect
-	// missing fields after unmarshaling.
-	Req
-)
-
-func (v UnmarshalPresence) String() string {
-	switch v {
-	case UPUnspecified:
-		return "UPUnspecified"
-	case Opt:
-		return "Opt"
-	case Nil:
-		return "Nil"
-	case Req:
-		return "Req"
-	default:
-		return fmt.Sprintf("UnmarshalPresence(%v)", int(v))
-	}
-}
-
 // UnmarshalOptions is used as a parameter by the NewUnmarshaler function.
 type UnmarshalOptions struct {
 	// NameTransformer is used to transform struct field names into a query
@@ -93,59 +47,6 @@ type UnmarshalOptions struct {
 	// DefaultUnmarshalPresence is used for the unmarshaling of struct fields
 	// that don't have an explicit UnmarshalPresence option set in their tags.
 	DefaultUnmarshalPresence UnmarshalPresence
-}
-
-// DefaultUnmarshaler is the unmarshaler used by the Unmarshal, UnmarshalValues,
-// CanUnmarshal and CanUnmarshalType functions.
-var DefaultUnmarshaler = NewUnmarshaler(&UnmarshalOptions{})
-
-// Unmarshal unmarshals a query string and stores the result to the object
-// pointed to by the given pointer.
-//
-// Unmarshal uses the inverse of the encodings that Marshal uses.
-//
-// A struct field tag can optionally contain one of the opt, nil and req options
-// for unmarshaling. If it contains none of these then opt is the default but
-// the default can also be changed by using a custom marshaler. The
-// UnmarshalPresence of a field is used only when the query string doesn't
-// contain a value for it:
-//  - nil succeeds and keeps the original field value
-//  - opt succeeds and keeps the original field value but in case of
-//    pointer-like types (pointers, slices) with nil field value it initialises
-//    the field with a newly created object.
-//  - req causes the unmarshal operation to fail with an error that can be
-//    detected using qs.IsRequiredFieldError.
-//
-// When unmarshaling a nil pointer field that is present in the query string
-// the pointer is automatically initialised even if it has the nil option in
-// its tag.
-func Unmarshal(into interface{}, queryString string) error {
-	return DefaultUnmarshaler.Unmarshal(into, queryString)
-}
-
-// UnmarshalValues is the same as Unmarshal but it unmarshals from a url.Values
-// instead of a query string.
-func UnmarshalValues(into interface{}, values url.Values) error {
-	return DefaultUnmarshaler.UnmarshalValues(into, values)
-}
-
-// CheckUnmarshal returns an error if the type of the given object can't be
-// unmarshaled from a url.Vales or query string. By default only maps and structs
-// can be unmarshaled from query strings given that all of their fields or values
-// can be unmarshaled from []string (which is the value type of the url.Values map).
-//
-// It performs the check on the type of the object without traversing or
-// unmarshaling the object.
-func CheckUnmarshal(into interface{}) error {
-	return DefaultUnmarshaler.CheckUnmarshal(into)
-}
-
-// CheckUnmarshalType returns an error if the given type can't be unmarshaled
-// from a url.Vales or query string. By default only maps and structs
-// can be unmarshaled from query strings given that all of their fields or values
-// can be unmarshaled from []string (which is the value type of the url.Values map).
-func CheckUnmarshalType(t reflect.Type) error {
-	return DefaultUnmarshaler.CheckUnmarshalType(t)
 }
 
 // QSUnmarshaler objects can be created by calling NewUnmarshaler and they can be
@@ -240,10 +141,6 @@ var defaultValuesUnmarshalerFactory = newValuesUnmarshalerFactory()
 // to unmarshal themselves.
 var defaultUnmarshalerFactory = newUnmarshalerFactory()
 
-// defaultUnmarshalPresence is used by the NewUnmarshaler function when its
-// UnmarshalOptions.DefaultUnmarshalPresence parameter is UPUnspecified.
-const defaultUnmarshalPresence = Opt
-
 func prepareUnmarshalOptions(opts UnmarshalOptions) *UnmarshalOptions {
 	if opts.NameTransformer == nil {
 		opts.NameTransformer = snakeCase
@@ -262,8 +159,8 @@ func prepareUnmarshalOptions(opts UnmarshalOptions) *UnmarshalOptions {
 	}
 	opts.UnmarshalerFactory = newUnmarshalerCache(opts.UnmarshalerFactory)
 
-	if opts.DefaultUnmarshalPresence == UPUnspecified {
-		opts.DefaultUnmarshalPresence = defaultUnmarshalPresence
+	if opts.DefaultUnmarshalPresence == UnmarshalPresenceUPUnspecified {
+		opts.DefaultUnmarshalPresence = UnmarshalPresenceOpt
 	}
 	return &opts
 }

@@ -85,6 +85,7 @@ func (o *fakeMarshalerFactory) Marshaler(t reflect.Type, opts *MarshalOptions) (
 }
 
 type fakeMarshaler struct {
+	//lint:ignore U1000 we don't care about the value
 	dummy int
 }
 

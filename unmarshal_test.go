@@ -619,7 +619,7 @@ func TestDefaultNil(t *testing.T) {
 	}, "&")
 
 	unmarshaler := NewUnmarshaler(&UnmarshalOptions{
-		DefaultUnmarshalPresence: Nil,
+		DefaultUnmarshalPresence: UnmarshalPresenceNil,
 	})
 
 	// default presence: nil, struct presence: unspecified, queryString: nozero
@@ -880,7 +880,7 @@ func TestDefaultReq(t *testing.T) {
 	}, "&")
 
 	unmarshaler := NewUnmarshaler(&UnmarshalOptions{
-		DefaultUnmarshalPresence: Req,
+		DefaultUnmarshalPresence: UnmarshalPresenceReq,
 	})
 
 	// default presence: req, struct presence: unspecified, queryString: nozero
@@ -1063,7 +1063,7 @@ func TestDefaultReq(t *testing.T) {
 func TestUnmarshalMap(t *testing.T) {
 	// Req should be ingored and shouldn't be a problem in case of map unmarshaling.
 	unmarshaler := NewUnmarshaler(&UnmarshalOptions{
-		DefaultUnmarshalPresence: Req,
+		DefaultUnmarshalPresence: UnmarshalPresenceReq,
 	})
 
 	{

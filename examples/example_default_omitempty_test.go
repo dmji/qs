@@ -15,7 +15,7 @@ import (
 // doesn't demonstrate that.
 func Example_defaultOmitEmpty() {
 	customMarshaler := qs.NewMarshaler(&qs.MarshalOptions{
-		DefaultMarshalPresence: qs.OmitEmpty,
+		DefaultMarshalPresence: qs.MarshalPresenceOmitEmpty,
 	})
 
 	type Query struct {

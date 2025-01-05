@@ -530,7 +530,7 @@ func TestDefaultKeepEmpty(t *testing.T) {
 
 func TestDefaultOmitEmpty(t *testing.T) {
 	marshaler := NewMarshaler(&MarshalOptions{
-		DefaultMarshalPresence: OmitEmpty,
+		DefaultMarshalPresence: MarshalPresenceOmitEmpty,
 	})
 
 	var i int = 42
@@ -795,7 +795,7 @@ func TestMarshalMap(t *testing.T) {
 
 	{
 		marshaler := NewMarshaler(&MarshalOptions{
-			DefaultMarshalPresence: OmitEmpty,
+			DefaultMarshalPresence: MarshalPresenceOmitEmpty,
 		})
 
 		// default presence: omitempty

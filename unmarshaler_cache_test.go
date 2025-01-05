@@ -85,6 +85,7 @@ func (o *fakeUnmarshalerFactory) Unmarshaler(t reflect.Type, opts *UnmarshalOpti
 }
 
 type fakeUnmarshaler struct {
+	//lint:ignore U1000 we don't care about the value
 	dummy int
 }
 

@@ -1,9 +1,7 @@
-package qs_test
+package custom_marshaler
 
 import (
-	"encoding/hex"
 	"fmt"
-	"reflect"
 	"time"
 
 	"github.com/pasztorpisti/qs"
@@ -66,85 +64,4 @@ func performDurationTest(m *qs.QSMarshaler, um *qs.QSUnmarshaler) {
 	err = um.Unmarshal(&query, queryStr)
 	fmt.Printf("Duration-Unmarshal-Result: len=%v duration=%v %v\n",
 		len(query), query["duration"].String(), err)
-}
-
-var byteSliceType = reflect.TypeOf([]byte(nil))
-var durationType = reflect.TypeOf(time.Duration(0))
-
-// marshalerFactory implements the MarshalerFactory interface and provides
-// custom Marshaler for the []byte type.
-type marshalerFactory struct {
-	orig qs.MarshalerFactory
-}
-
-func (f *marshalerFactory) Marshaler(t reflect.Type, opts *qs.MarshalOptions) (qs.Marshaler, error) {
-	switch t {
-	case byteSliceType:
-		return byteSliceMarshaler{}, nil
-	case durationType:
-		return durationMarshalerInstance, nil
-	default:
-		return f.orig.Marshaler(t, opts)
-	}
-}
-
-// unmarshalerFactory implements the UnmarshalerFactory interface and provides
-// custom Unmarshaler for the []byte type.
-type unmarshalerFactory struct {
-	orig qs.UnmarshalerFactory
-}
-
-func (f *unmarshalerFactory) Unmarshaler(t reflect.Type, opts *qs.UnmarshalOptions) (qs.Unmarshaler, error) {
-	switch t {
-	case byteSliceType:
-		return byteSliceMarshaler{}, nil
-	case durationType:
-		return durationMarshalerInstance, nil
-	default:
-		return f.orig.Unmarshaler(t, opts)
-	}
-}
-
-// byteSliceMarshaler implements the Marshaler and Unmarshaler interfaces to
-// provide custom marshaling and unmarshaling for the []byte type.
-type byteSliceMarshaler struct{}
-
-func (byteSliceMarshaler) Marshal(v reflect.Value, opts *qs.MarshalOptions) ([]string, error) {
-	return []string{hex.EncodeToString(v.Interface().([]byte))}, nil
-}
-
-func (byteSliceMarshaler) Unmarshal(v reflect.Value, a []string, opts *qs.UnmarshalOptions) error {
-	s, err := opts.SliceToString(a)
-	if err != nil {
-		return err
-	}
-	b, err := hex.DecodeString(s)
-	if err != nil {
-		return err
-	}
-	v.Set(reflect.ValueOf(b))
-	return nil
-}
-
-var durationMarshalerInstance = &durationMarshaler{}
-
-// durationMarshaler implements the Marshaler and Unmarshaler interfaces to
-// provide custom marshaling and unmarshaling for the time.Duration type.
-type durationMarshaler struct{}
-
-func (o *durationMarshaler) Marshal(v reflect.Value, opts *qs.MarshalOptions) ([]string, error) {
-	return []string{v.Interface().(time.Duration).String()}, nil
-}
-
-func (o *durationMarshaler) Unmarshal(v reflect.Value, a []string, opts *qs.UnmarshalOptions) error {
-	s, err := opts.SliceToString(a)
-	if err != nil {
-		return err
-	}
-	t, err := time.ParseDuration(s)
-	if err != nil {
-		return fmt.Errorf("unsupported time format: %v", s)
-	}
-	v.Set(reflect.ValueOf(t))
-	return nil
 }
