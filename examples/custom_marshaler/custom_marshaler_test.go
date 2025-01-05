@@ -56,7 +56,7 @@ func performSliceTest(name string, m *qs.QSMarshaler, um *qs.QSUnmarshaler) {
 
 func performDurationTest(m *qs.QSMarshaler, um *qs.QSUnmarshaler) {
 	queryStr, err := m.Marshal(map[string]time.Duration{
-		"duration": time.Millisecond * (61*1000 + 200),
+		"duration": time.Millisecond * 61200,
 	})
 	fmt.Printf("Duration-Marshal-Result: %v %v\n", queryStr, err)
 

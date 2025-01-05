@@ -84,10 +84,7 @@ func (o *fakeUnmarshalerFactory) Unmarshaler(t reflect.Type, opts *UnmarshalOpti
 	return o.u, o.err
 }
 
-type fakeUnmarshaler struct {
-	//lint:ignore U1000 we don't care about the value
-	dummy int
-}
+type fakeUnmarshaler struct{}
 
 func (o *fakeUnmarshaler) Unmarshal(v reflect.Value, a []string, opts *UnmarshalOptions) error {
 	return nil
