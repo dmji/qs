@@ -6,6 +6,12 @@ import (
 	"reflect"
 )
 
+// ValuesUnmarshaler can unmarshal a url.Values into a value.
+type ValuesUnmarshaler interface {
+	// UnmarshalValues unmarshals the given url.Values using opts into v.
+	UnmarshalValues(v reflect.Value, vs url.Values, opts *UnmarshalOptions) error
+}
+
 // structUnmarshaler implements ValuesUnmarshaler.
 type structUnmarshaler struct {
 	Type           reflect.Type

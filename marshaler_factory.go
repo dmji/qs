@@ -19,6 +19,13 @@ type MarshalerFactory interface {
 	Marshaler(t reflect.Type, opts *MarshalOptions) (Marshaler, error)
 }
 
+// marshalerFactory implements the MarshalerFactory interface.
+type marshalerFactory struct {
+	Types             map[reflect.Type]Marshaler
+	KindSubRegistries map[reflect.Kind]MarshalerFactory
+	Kinds             map[reflect.Kind]Marshaler
+}
+
 // MarshalQS is an interface that can be implemented by any type that
 // wants to handle its own marshaling instead of relying on the default
 // marshaling provided by this package.
@@ -26,13 +33,6 @@ type MarshalQS interface {
 	// MarshalQS is essentially the same as the Marshaler.Marshal
 	// method without its v parameter.
 	MarshalQS(opts *MarshalOptions) ([]string, error)
-}
-
-// marshalerFactory implements the MarshalerFactory interface.
-type marshalerFactory struct {
-	Types             map[reflect.Type]Marshaler
-	KindSubRegistries map[reflect.Kind]MarshalerFactory
-	Kinds             map[reflect.Kind]Marshaler
 }
 
 var marshalQSInterfaceType = reflect.TypeOf((*MarshalQS)(nil)).Elem()
@@ -57,7 +57,7 @@ func (p *marshalerFactory) Marshaler(t reflect.Type, opts *MarshalOptions) (Mars
 	return nil, &unhandledTypeError{Type: t}
 }
 
-func newMarshalerFactory() MarshalerFactory {
+func newMarshalerFactory() *marshalerFactory {
 	return &marshalerFactory{
 		Types: map[reflect.Type]Marshaler{
 			timeType: primitiveMarshalerFunc(marshalTime),

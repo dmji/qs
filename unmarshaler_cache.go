@@ -20,6 +20,10 @@ func (o *valuesUnmarshalerCache) ValuesUnmarshaler(t reflect.Type, opts *Unmarsh
 	return cacher(o.wrapped.ValuesUnmarshaler, &o.cache, t, opts)
 }
 
+func (p *valuesUnmarshalerCache) RegisterSubFactory(k reflect.Kind, fn ValuesUnmarshalerFactoryFunc) error {
+	return p.wrapped.RegisterSubFactory(k, fn)
+}
+
 func newUnmarshalerCache(wrapped UnmarshalerFactory) UnmarshalerFactory {
 	return &unmarshalerCache{
 		wrapped: wrapped,

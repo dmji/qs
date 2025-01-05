@@ -2,6 +2,6 @@
   "explorer.fileNesting.patterns": {
     "README.md": "LICENSE.txt,doc.go",
     "go.mod": "go.sum,.gitignore,.prettierrc,tailwind.config.js,.air.toml,.env*",
-    "*.go": "${capture}_test.go,${capture}_string.go,${capture}_global.go,${capture}_enum.go,${capture}.sql"
+    "*.go": "${capture}_test.go,${capture}_string.go,${capture}_global.go,${capture}_checks.go,${capture}_enum.go,${capture}.sql"
   }
 }

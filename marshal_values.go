@@ -6,6 +6,12 @@ import (
 	"reflect"
 )
 
+// ValuesMarshaler can marshal a value into a url.Values.
+type ValuesMarshaler interface {
+	// MarshalValues marshals the given v value using opts into a url.Values.
+	MarshalValues(v reflect.Value, opts *MarshalOptions) (url.Values, error)
+}
+
 // structMarshaler implements ValuesMarshaler.
 type structMarshaler struct {
 	Type           reflect.Type

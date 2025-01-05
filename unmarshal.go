@@ -32,7 +32,7 @@ type UnmarshalOptions struct {
 	// In some cases you might want to provide your own function that is more
 	// forgiving. E.g.: you can provide a function that picks the first or last
 	// item, or concatenates/joins the whole list into a single string.
-	SliceToString func([]string) (string, error)
+	SliceToString SliceToStringFunc
 
 	// ValuesUnmarshalerFactory is used by QSUnmarshaler to create ValuesUnmarshaler
 	// objects for specific types. If this field is nil then NewUnmarshaler uses

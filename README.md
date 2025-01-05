@@ -8,6 +8,14 @@ Note that html forms are often `POST`-ed in the HTTP request body in the same
 format as query strings (with an encoding called `application/x-www-form-urlencoded`)
 so this package can be used for that as well.
 
+# Changes from original
+
+- Subjective improvements
+  - Added go-stringer generator for enums
+  - Union duplicated code in cache structs to generic cacher
+- Improved custom marshaler workflow
+  - Added register handlers instead of composition
+
 # Quick Intro
 
 The go standard library can convert only between the (query) string and the
@@ -34,6 +42,7 @@ This `qs` package adds struct marshaling and unmarshaling to your arsenal:
 ```
 
 Example:
+
 ```go
 package main
 
@@ -88,7 +97,7 @@ func main() {
     field tag doesn't set a custom name for the field. The default function
     converts CamelCase go struct field names to snake_case which is the standard
     in case of query strings.
-  - When a struct field tag specifies none of the  `keepempty` and `omitempty`
+  - When a struct field tag specifies none of the `keepempty` and `omitempty`
     options the marshaler uses `keepempty` by default. By creating a custom
     marshaler you can
     [change the default to `omitempty`](https://godoc.org/github.com/pasztorpisti/qs/#example-package--DefaultOmitEmpty).

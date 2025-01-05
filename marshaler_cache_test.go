@@ -17,6 +17,10 @@ func (o *fakeValuesMarshalerFactory) ValuesMarshaler(t reflect.Type, opts *Marsh
 	return o.m, o.err
 }
 
+func (p *fakeValuesMarshalerFactory) RegisterSubFactory(k reflect.Kind, fn ValuesMarshalerFactoryFunc) error {
+	panic("!mock not implemented!")
+}
+
 func TestValuesMarshalerCacheSuccess(t *testing.T) {
 	expected := &structMarshaler{}
 	wrapped := &fakeValuesMarshalerFactory{m: expected}

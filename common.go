@@ -19,6 +19,7 @@ const tagKey = "qs"
 // NameTransformFunc is the type of the DefaultNameTransform,
 // MarshalOptions.NameTransformer and UnmarshalOptions.NameTransformer variables.
 type NameTransformFunc func(string) string
+type SliceToStringFunc func([]string) (string, error)
 
 var (
 	stringType = reflect.TypeOf("")

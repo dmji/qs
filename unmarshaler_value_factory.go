@@ -1,48 +1,63 @@
 package qs
 
 import (
-	"net/url"
+	"errors"
 	"reflect"
 )
 
-// ValuesUnmarshaler can unmarshal a url.Values into a value.
-type ValuesUnmarshaler interface {
-	// UnmarshalValues unmarshals the given url.Values using opts into v.
-	UnmarshalValues(v reflect.Value, vs url.Values, opts *UnmarshalOptions) error
-}
+type ValuesUnmarshalerFactoryFunc func(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error)
 
 // ValuesUnmarshalerFactory can create ValuesUnmarshaler objects for various types.
 type ValuesUnmarshalerFactory interface {
 	// ValuesUnmarshaler returns a ValuesUnmarshaler object for the given t
 	// type and opts options.
 	ValuesUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error)
+
+	// RegisterSubFactory registers a ValuesUnmarshalerFactory for the given kind
+	RegisterSubFactory(k reflect.Kind, fn ValuesUnmarshalerFactoryFunc) error
 }
 
 type valuesUnmarshalerFactory struct {
-	KindSubRegistries map[reflect.Kind]ValuesUnmarshalerFactory
+	kindSubRegistries          map[reflect.Kind]ValuesUnmarshalerFactory
+	kindSubRegistriesOverriden map[reflect.Kind]ValuesUnmarshalerFactory
 }
 
 func (p *valuesUnmarshalerFactory) ValuesUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error) {
-	if subFactory, ok := p.KindSubRegistries[t.Kind()]; ok {
+	if subFactory, ok := p.kindSubRegistriesOverriden[t.Kind()]; ok {
+		return subFactory.ValuesUnmarshaler(t, opts)
+	}
+
+	if subFactory, ok := p.kindSubRegistries[t.Kind()]; ok {
 		return subFactory.ValuesUnmarshaler(t, opts)
 	}
 
 	return nil, &unhandledTypeError{Type: t}
 }
 
-func newValuesUnmarshalerFactory() ValuesUnmarshalerFactory {
+func (p *valuesUnmarshalerFactory) RegisterSubFactory(k reflect.Kind, fn ValuesUnmarshalerFactoryFunc) error {
+	p.kindSubRegistriesOverriden[k] = &valuesUnmarshalerFactoryFunc{fn}
+	return nil
+}
+
+func newValuesUnmarshalerFactory() *valuesUnmarshalerFactory {
 	return &valuesUnmarshalerFactory{
-		KindSubRegistries: map[reflect.Kind]ValuesUnmarshalerFactory{
-			reflect.Ptr:    valuesUnmarshalerFactoryFunc(newPtrValuesUnmarshaler),
-			reflect.Struct: valuesUnmarshalerFactoryFunc(newStructUnmarshaler),
-			reflect.Map:    valuesUnmarshalerFactoryFunc(newMapUnmarshaler),
+		kindSubRegistries: map[reflect.Kind]ValuesUnmarshalerFactory{
+			reflect.Ptr:    &valuesUnmarshalerFactoryFunc{newPtrValuesUnmarshaler},
+			reflect.Struct: &valuesUnmarshalerFactoryFunc{newStructUnmarshaler},
+			reflect.Map:    &valuesUnmarshalerFactoryFunc{newMapUnmarshaler},
 		},
 	}
 }
 
 // valuesUnmarshalerFactoryFunc implements the UnmarshalerFactory interface.
-type valuesUnmarshalerFactoryFunc func(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error)
+type valuesUnmarshalerFactoryFunc struct {
+	fn ValuesUnmarshalerFactoryFunc
+}
 
 func (f valuesUnmarshalerFactoryFunc) ValuesUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error) {
-	return f(t, opts)
+	return f.fn(t, opts)
+}
+
+func (p *valuesUnmarshalerFactoryFunc) RegisterSubFactory(k reflect.Kind, fn ValuesUnmarshalerFactoryFunc) error {
+	return errors.New("not implemented")
 }
