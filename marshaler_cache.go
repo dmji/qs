@@ -38,3 +38,16 @@ type marshalerCache struct {
 func (o *marshalerCache) Marshaler(t reflect.Type, opts *MarshalOptions) (Marshaler, error) {
 	return cacher(o.wrapped.Marshaler, &o.cache, t, opts)
 }
+
+func (p *marshalerCache) RegisterSubFactory(k reflect.Kind, fn MarshalerFactoryFunc) error {
+	return p.wrapped.RegisterSubFactory(k, fn)
+}
+
+func (p *marshalerCache) RegisterCustomType(k reflect.Type, fn PrimitiveMarshalerFunc) error {
+	return p.wrapped.RegisterCustomType(k, fn)
+
+}
+
+func (p *marshalerCache) RegisterKindOverride(k reflect.Kind, fn PrimitiveMarshalerFunc) error {
+	return p.wrapped.RegisterKindOverride(k, fn)
+}

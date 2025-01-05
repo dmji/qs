@@ -22,3 +22,16 @@ func (f *marshalerFactory) Marshaler(t reflect.Type, opts *qs.MarshalOptions) (q
 		return f.orig.Marshaler(t, opts)
 	}
 }
+
+func (p *marshalerFactory) RegisterSubFactory(k reflect.Kind, fn qs.MarshalerFactoryFunc) error {
+	return p.orig.RegisterSubFactory(k, fn)
+}
+
+func (p *marshalerFactory) RegisterCustomType(k reflect.Type, fn qs.PrimitiveMarshalerFunc) error {
+	return p.orig.RegisterCustomType(k, fn)
+
+}
+
+func (p *marshalerFactory) RegisterKindOverride(k reflect.Kind, fn qs.PrimitiveMarshalerFunc) error {
+	return p.orig.RegisterKindOverride(k, fn)
+}

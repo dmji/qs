@@ -32,7 +32,6 @@ type UnmarshalerFactory interface {
 	// options.
 	Unmarshaler(t reflect.Type, opts *UnmarshalOptions) (Unmarshaler, error)
 
-	// RegisterSubFactory registers a ValuesUnmarshalerFactory for the given kind
 	RegisterSubFactory(k reflect.Kind, fn UnmarshalerFactoryFunc) error
 	RegisterCustomType(k reflect.Type, fn PrimitiveUnmarshalerFunc) error
 	RegisterKindOverride(k reflect.Kind, fn PrimitiveUnmarshalerFunc) error
