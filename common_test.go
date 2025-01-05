@@ -75,6 +75,7 @@ func TestParseTag_SurplusComma(t *testing.T) {
 
 func TestParseTag_IncompatibleOptions(t *testing.T) {
 	tagStrList := []reflect.StructTag{
+		`qs:",opt,req"`,
 		`qs:",nil,opt,req"`,
 		`qs:",nil,req,opt"`,
 		`qs:",opt,req,nil"`,
@@ -82,7 +83,6 @@ func TestParseTag_IncompatibleOptions(t *testing.T) {
 		`qs:",req,nil,opt"`,
 		`qs:",req,opt,nil"`,
 		`qs:",req,opt"`,
-		`qs:",opt,req"`,
 		`qs:",req,nil"`,
 		`qs:",nil,req"`,
 		`qs:",nil,opt"`,

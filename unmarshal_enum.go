@@ -1,6 +1,6 @@
 package qs
 
-//go:generate go-stringer -type=UnmarshalPresence --trimprefix=UnmarshalPresence -output unmarshal_string.go
+//go:generate go-stringer -type=UnmarshalPresence --trimprefix=UnmarshalPresence -output unmarshal_string.go -nametransform=lower -fromstringgenfn
 
 // UnmarshalPresence is an enum that controls the unmarshaling of fields.
 // This option is used by the unmarshaler only if the given field isn't present

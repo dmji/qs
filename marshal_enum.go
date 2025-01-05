@@ -1,6 +1,6 @@
 package qs
 
-//go:generate go-stringer -type=MarshalPresence --trimprefix=MarshalPresence -output marshal_string.go
+//go:generate go-stringer -type=MarshalPresence --trimprefix=MarshalPresence -output marshal_string.go -nametransform=lower -fromstringgenfn
 
 // MarshalPresence is an enum that controls the marshaling of empty fields.
 // A field is empty if it has its zero value or it is an empty container.

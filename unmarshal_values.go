@@ -21,7 +21,7 @@ type embeddedFieldUnmarshaler struct {
 type fieldUnmarshaler struct {
 	FieldIndex  int
 	Unmarshaler Unmarshaler
-	Tag         parsedTag
+	Tag         *parsedTag
 }
 
 // newStructUnmarshaler creates a struct unmarshaler for a specific struct type.
@@ -57,8 +57,8 @@ func newStructUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarsh
 }
 
 func newFieldUnmarshaler(sf reflect.StructField, opts *UnmarshalOptions) (vum ValuesUnmarshaler, fum *fieldUnmarshaler, err error) {
-	skip, tag, err := getStructFieldInfo(sf, opts.NameTransformer, MarshalPresenceMPUnspecified, opts.DefaultUnmarshalPresence)
-	if skip || err != nil {
+	tag, err := getStructFieldInfo(sf, opts.NameTransformer, MarshalPresenceMPUnspecified, opts.DefaultUnmarshalPresence)
+	if tag == nil || err != nil {
 		return
 	}
 

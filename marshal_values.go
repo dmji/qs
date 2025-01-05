@@ -21,7 +21,7 @@ type embeddedFieldMarshaler struct {
 type fieldMarshaler struct {
 	FieldIndex int
 	Marshaler  Marshaler
-	Tag        parsedTag
+	Tag        *parsedTag
 }
 
 // newStructMarshaler creates a struct marshaler for a specific struct type.
@@ -57,8 +57,8 @@ func newStructMarshaler(t reflect.Type, opts *MarshalOptions) (ValuesMarshaler, 
 }
 
 func newFieldMarshaler(sf reflect.StructField, opts *MarshalOptions) (vm ValuesMarshaler, fm *fieldMarshaler, err error) {
-	skip, tag, err := getStructFieldInfo(sf, opts.NameTransformer, opts.DefaultMarshalPresence, UnmarshalPresenceUPUnspecified)
-	if skip || err != nil {
+	tag, err := getStructFieldInfo(sf, opts.NameTransformer, opts.DefaultMarshalPresence, UnmarshalPresenceUPUnspecified)
+	if tag == nil || err != nil {
 		return
 	}
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"reflect"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -19,9 +20,11 @@ const tagKey = "qs"
 // MarshalOptions.NameTransformer and UnmarshalOptions.NameTransformer variables.
 type NameTransformFunc func(string) string
 
-var stringType = reflect.TypeOf("")
-var timeType = reflect.TypeOf(time.Time{})
-var urlType = reflect.TypeOf(url.URL{})
+var (
+	stringType = reflect.TypeOf("")
+	timeType   = reflect.TypeOf(time.Time{})
+	urlType    = reflect.TypeOf(url.URL{})
+)
 
 type parsedTag struct {
 	Name              string
@@ -29,70 +32,69 @@ type parsedTag struct {
 	UnmarshalPresence UnmarshalPresence
 }
 
-func getStructFieldInfo(field reflect.StructField, nt NameTransformFunc, defaultMarshalPresence MarshalPresence, defaultUnmarshalPresence UnmarshalPresence) (skip bool, tag parsedTag, err error) {
+func getStructFieldInfo(field reflect.StructField, nt NameTransformFunc, defaultMarshalPresence MarshalPresence, defaultUnmarshalPresence UnmarshalPresence) (*parsedTag, error) {
 	// Skipping unexported fields.
 	if field.PkgPath != "" && !field.Anonymous {
-		skip = true
-		return
+		return nil, nil
 	}
 
-	tag, err = parseFieldTag(field.Tag, defaultMarshalPresence, defaultUnmarshalPresence)
+	tag, err := parseFieldTag(field.Tag, defaultMarshalPresence, defaultUnmarshalPresence)
 	if err != nil {
 		err = fmt.Errorf("invalid tag: %q :: %v", field.Tag, err)
-		return
+		return nil, err
 	}
 
 	// Skipping this field if the tag specifies "-" as field name.
 	if tag.Name == "-" {
-		skip = true
-		return
+		return nil, nil
 	}
 
 	if tag.Name == "" {
 		tag.Name = nt(field.Name)
 	}
 
-	return
+	return tag, nil
 }
 
-func parseFieldTag(tagStr reflect.StructTag, defaultMarshalPresence MarshalPresence, defaultUnmarshalPresence UnmarshalPresence) (tag parsedTag, err error) {
+func parseFieldTag(tagStr reflect.StructTag, defaultMarshalPresence MarshalPresence, defaultUnmarshalPresence UnmarshalPresence) (*parsedTag, error) {
 	v := tagStr.Get(tagKey)
-	arr := strings.Split(v, ",")
-	tag.Name = arr[0]
-
-	setMarshalPresence := func(v MarshalPresence) {
-		if tag.MarshalPresence != MarshalPresenceMPUnspecified {
-			err = fmt.Errorf("only one MarshalPresence option is allwed - you've specified at least two: %v, %v", tag.MarshalPresence, v)
-		}
-		tag.MarshalPresence = v
+	nameAndOptions := strings.Split(v, ",")
+	tag := &parsedTag{
+		Name:              nameAndOptions[0],
+		MarshalPresence:   MarshalPresenceMPUnspecified,
+		UnmarshalPresence: UnmarshalPresenceUPUnspecified,
 	}
 
-	setUnmarshalPresence := func(v UnmarshalPresence) {
-		if tag.UnmarshalPresence != UnmarshalPresenceUPUnspecified {
-			err = fmt.Errorf("only one UnmarshalPresence option is allwed - you've specified at least two: %v, %v", tag.UnmarshalPresence, v)
-		}
-		tag.UnmarshalPresence = v
+	options := nameAndOptions[1:]
+	if slices.IndexFunc(options, func(i string) bool { return len(i) == 0 }) != -1 {
+		return nil, errors.New("tag string contains a surplus comma")
 	}
 
-	for _, option := range arr[1:] {
-		switch option {
-		case "nil":
-			setUnmarshalPresence(UnmarshalPresenceNil)
-		case "opt":
-			setUnmarshalPresence(UnmarshalPresenceOpt)
-		case "req":
-			setUnmarshalPresence(UnmarshalPresenceReq)
-		case "keepempty":
-			setMarshalPresence(MarshalPresenceKeepEmpty)
-		case "omitempty":
-			setMarshalPresence(MarshalPresenceOmitEmpty)
-		case "":
-			err = errors.New("tag string contains a surplus comma")
-		default:
-			err = fmt.Errorf("invalid option in field tag: %q", option)
+	for _, option := range options {
+
+		bErr := true
+		eU, err := UnmarshalPresenceFromString(option)
+		if err == nil {
+
+			if tag.UnmarshalPresence != UnmarshalPresenceUPUnspecified {
+				return nil, fmt.Errorf("only one UnmarshalPresence option is allwed - you've specified at least two: %v, %v", tag.UnmarshalPresence, v)
+			}
+			tag.UnmarshalPresence = eU
+			bErr = false
 		}
-		if err != nil {
-			return
+
+		eM, err := MarshalPresenceFromString(option)
+		if err == nil {
+
+			if tag.MarshalPresence != MarshalPresenceMPUnspecified {
+				return nil, fmt.Errorf("only one MarshalPresence option is allwed - you've specified at least two: %v, %v", tag.MarshalPresence, v)
+			}
+			tag.MarshalPresence = eM
+			bErr = false
+		}
+
+		if bErr {
+			return nil, fmt.Errorf("invalid option in field tag: %q", option)
 		}
 	}
 
@@ -103,7 +105,7 @@ func parseFieldTag(tagStr reflect.StructTag, defaultMarshalPresence MarshalPrese
 		tag.UnmarshalPresence = defaultUnmarshalPresence
 	}
 
-	return
+	return tag, nil
 }
 
 // snakeCase converts CamelCase names to snake_case with lowercase letters and
