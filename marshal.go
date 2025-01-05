@@ -46,6 +46,20 @@ func NewMarshaler(opts *MarshalOptions) *QSMarshaler {
 	}
 }
 
+func (p *QSMarshaler) RegisterSubFactory(k reflect.Kind, fn MarshalerFactoryFunc) error {
+	return p.opts.MarshalerFactory.RegisterSubFactory(k, fn)
+
+}
+
+func (p *QSMarshaler) RegisterCustomType(k reflect.Type, fn PrimitiveMarshalerFunc) error {
+	return p.opts.MarshalerFactory.RegisterCustomType(k, fn)
+
+}
+
+func (p *QSMarshaler) RegisterKindOverride(k reflect.Kind, fn PrimitiveMarshalerFunc) error {
+	return p.opts.MarshalerFactory.RegisterKindOverride(k, fn)
+}
+
 // Marshal marshals a given object into a query string.
 // See the documentation of the global Marshal func.
 func (p *QSMarshaler) Marshal(i interface{}) (string, error) {
@@ -103,30 +117,18 @@ func NewDefaultMarshalOptions() *MarshalOptions {
 	return prepareMarshalOptions(MarshalOptions{})
 }
 
-// defaultValuesMarshalerFactory is used by the NewMarshaler function when its
-// MarshalOptions.ValuesMarshalerFactory parameter is nil.
-var defaultValuesMarshalerFactory = newValuesMarshalerFactory()
-
-// defaultMarshalerFactory is used by the NewMarshaler function when its
-// MarshalOptions.MarshalerFactory parameter is nil. This variable is set
-// to a factory object that handles most builtin types (arrays, pointers,
-// bool, int, etc...). If a type implements the MarshalQS interface then this
-// factory returns an marshaler object that allows instances of the given type
-// to marshal themselves.
-var defaultMarshalerFactory = newMarshalerFactory()
-
 func prepareMarshalOptions(opts MarshalOptions) *MarshalOptions {
 	if opts.NameTransformer == nil {
 		opts.NameTransformer = snakeCase
 	}
 
 	if opts.ValuesMarshalerFactory == nil {
-		opts.ValuesMarshalerFactory = defaultValuesMarshalerFactory
+		opts.ValuesMarshalerFactory = newValuesMarshalerFactory()
 	}
 	opts.ValuesMarshalerFactory = newValuesMarshalerCache(opts.ValuesMarshalerFactory)
 
 	if opts.MarshalerFactory == nil {
-		opts.MarshalerFactory = defaultMarshalerFactory
+		opts.MarshalerFactory = newMarshalerFactory()
 	}
 	opts.MarshalerFactory = newMarshalerCache(opts.MarshalerFactory)
 

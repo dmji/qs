@@ -62,6 +62,20 @@ func NewUnmarshaler(opts *UnmarshalOptions) *QSUnmarshaler {
 	}
 }
 
+func (p *QSUnmarshaler) RegisterSubFactory(k reflect.Kind, fn UnmarshalerFactoryFunc) error {
+	return p.opts.UnmarshalerFactory.RegisterSubFactory(k, fn)
+
+}
+
+func (p *QSUnmarshaler) RegisterCustomType(k reflect.Type, fn PrimitiveUnmarshalerFunc) error {
+	return p.opts.UnmarshalerFactory.RegisterCustomType(k, fn)
+
+}
+
+func (p *QSUnmarshaler) RegisterKindOverride(k reflect.Kind, fn PrimitiveUnmarshalerFunc) error {
+	return p.opts.UnmarshalerFactory.RegisterKindOverride(k, fn)
+}
+
 // Unmarshal unmarshals an object from a query string.
 // See the documentation of the global Unmarshal func.
 func (p *QSUnmarshaler) Unmarshal(into interface{}, queryString string) error {
@@ -129,18 +143,6 @@ var defaultSliceToString = func(a []string) (string, error) {
 	return a[0], nil
 }
 
-// defaultValuesUnmarshalerFactory is used by the NewUnmarshaler function when
-// its UnmarshalOptions.ValuesUnmarshalerFactory parameter is nil.
-var defaultValuesUnmarshalerFactory = newValuesUnmarshalerFactory()
-
-// defaultUnmarshalerFactory is used by the NewUnmarshaler function when its
-// UnmarshalOptions.UnmarshalerFactory parameter is nil. This variable is set
-// to a factory object that handles most builtin types (arrays, pointers,
-// bool, int, etc...). If a type implements the UnmarshalQS interface then this
-// factory returns an unmarshaler object that allows instances of the given type
-// to unmarshal themselves.
-var defaultUnmarshalerFactory = newUnmarshalerFactory()
-
 func prepareUnmarshalOptions(opts UnmarshalOptions) *UnmarshalOptions {
 	if opts.NameTransformer == nil {
 		opts.NameTransformer = snakeCase
@@ -150,12 +152,12 @@ func prepareUnmarshalOptions(opts UnmarshalOptions) *UnmarshalOptions {
 	}
 
 	if opts.ValuesUnmarshalerFactory == nil {
-		opts.ValuesUnmarshalerFactory = defaultValuesUnmarshalerFactory
+		opts.ValuesUnmarshalerFactory = newValuesUnmarshalerFactory()
 	}
 	opts.ValuesUnmarshalerFactory = newValuesUnmarshalerCache(opts.ValuesUnmarshalerFactory)
 
 	if opts.UnmarshalerFactory == nil {
-		opts.UnmarshalerFactory = defaultUnmarshalerFactory
+		opts.UnmarshalerFactory = newUnmarshalerFactory()
 	}
 	opts.UnmarshalerFactory = newUnmarshalerCache(opts.UnmarshalerFactory)
 

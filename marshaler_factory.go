@@ -51,6 +51,9 @@ type MarshalQS interface {
 var marshalQSInterfaceType = reflect.TypeOf((*MarshalQS)(nil)).Elem()
 
 func (p *marshalerFactory) Marshaler(t reflect.Type, opts *MarshalOptions) (Marshaler, error) {
+	if marshaler, ok := p.typesOverriden[t]; ok {
+		return marshaler, nil
+	}
 	if marshaler, ok := p.types[t]; ok {
 		return marshaler, nil
 	}
@@ -60,8 +63,15 @@ func (p *marshalerFactory) Marshaler(t reflect.Type, opts *MarshalOptions) (Mars
 	}
 
 	k := t.Kind()
+	if subFactory, ok := p.kindSubRegistriesOverriden[k]; ok {
+		return subFactory.Marshaler(t, opts)
+	}
 	if subFactory, ok := p.kindSubRegistries[k]; ok {
 		return subFactory.Marshaler(t, opts)
+	}
+
+	if marshaler, ok := p.kindsOverriden[k]; ok {
+		return marshaler, nil
 	}
 	if marshaler, ok := p.kinds[k]; ok {
 		return marshaler, nil
@@ -87,6 +97,10 @@ func (p *marshalerFactory) RegisterKindOverride(k reflect.Kind, fn PrimitiveMars
 
 func newMarshalerFactory() *marshalerFactory {
 	return &marshalerFactory{
+		typesOverriden:             map[reflect.Type]Marshaler{},
+		kindSubRegistriesOverriden: map[reflect.Kind]MarshalerFactory{},
+		kindsOverriden:             map[reflect.Kind]Marshaler{},
+
 		types: map[reflect.Type]Marshaler{
 			timeType: &primitiveMarshalerFunc{marshalTime},
 			urlType:  &primitiveMarshalerFunc{marshalURL},

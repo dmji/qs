@@ -60,6 +60,9 @@ type UnmarshalQS interface {
 var unmarshalQSInterfaceType = reflect.TypeOf((*UnmarshalQS)(nil)).Elem()
 
 func (p *unmarshalerFactory) Unmarshaler(t reflect.Type, opts *UnmarshalOptions) (Unmarshaler, error) {
+	if unmarshaler, ok := p.typesOverriden[t]; ok {
+		return unmarshaler, nil
+	}
 	if unmarshaler, ok := p.types[t]; ok {
 		return unmarshaler, nil
 	}
@@ -69,8 +72,15 @@ func (p *unmarshalerFactory) Unmarshaler(t reflect.Type, opts *UnmarshalOptions)
 	}
 
 	k := t.Kind()
+	if subFactory, ok := p.kindSubRegistriesOverriden[k]; ok {
+		return subFactory.Unmarshaler(t, opts)
+	}
 	if subFactory, ok := p.kindSubRegistries[k]; ok {
 		return subFactory.Unmarshaler(t, opts)
+	}
+
+	if unmarshaler, ok := p.kindsOverriden[k]; ok {
+		return unmarshaler, nil
 	}
 	if unmarshaler, ok := p.kinds[k]; ok {
 		return unmarshaler, nil
@@ -96,6 +106,10 @@ func (p *unmarshalerFactory) RegisterKindOverride(k reflect.Kind, fn PrimitiveUn
 
 func newUnmarshalerFactory() *unmarshalerFactory {
 	return &unmarshalerFactory{
+		typesOverriden:             map[reflect.Type]Unmarshaler{},
+		kindSubRegistriesOverriden: map[reflect.Kind]UnmarshalerFactory{},
+		kindsOverriden:             map[reflect.Kind]Unmarshaler{},
+
 		types: map[reflect.Type]Unmarshaler{
 			timeType: &primitiveUnmarshalerFunc{unmarshalTime},
 			urlType:  &primitiveUnmarshalerFunc{unmarshalURL},
