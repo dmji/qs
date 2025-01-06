@@ -19,9 +19,3 @@ const (
 	// MarshalPresenceOmitEmpty doesn't marshal the values of empty fields into the marshal output.
 	MarshalPresenceOmitEmpty
 )
-
-func WithMarshalPresence(presence MarshalPresence) func(*QSMarshaler) {
-	return func(m *QSMarshaler) {
-		m.opts._DefaultMarshalPresence = presence
-	}
-}
