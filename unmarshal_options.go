@@ -93,6 +93,12 @@ func WithUnmarshalPresence(presence UnmarshalPresence) func(*QSUnmarshaler) {
 	}
 }
 
+func WithCustomSliceToStringFunc(fn SliceToStringFunc) func(*QSUnmarshaler) {
+	return func(m *QSUnmarshaler) {
+		m.opts.SliceToString = fn
+	}
+}
+
 func WithCustomStringToUrlQueryParser(fn func(query string) (url.Values, error)) func(*QSUnmarshaler) {
 	return func(m *QSUnmarshaler) {
 		m.stringToQueryParser = fn
