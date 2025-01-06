@@ -32,7 +32,7 @@ func (p *valuesMarshalerFactory) ValuesMarshaler(t reflect.Type, opts *MarshalOp
 		return subFactory.ValuesMarshaler(t, opts)
 	}
 
-	return nil, &unhandledTypeError{Type: t}
+	return nil, &UnhandledTypeError{Type: t}
 }
 
 func (p *valuesMarshalerFactory) RegisterSubFactory(k reflect.Kind, fn ValuesMarshalerFactoryFunc) error {

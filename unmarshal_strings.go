@@ -16,7 +16,7 @@ type ptrUnmarshaler struct {
 
 func newPtrUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (Unmarshaler, error) {
 	if t.Kind() != reflect.Ptr {
-		return nil, &wrongKindError{Expected: reflect.Ptr, Actual: t}
+		return nil, &WrongKindError{Expected: reflect.Ptr, Actual: t}
 	}
 	et := t.Elem()
 	eu, err := opts.UnmarshalerFactory.Unmarshaler(et, opts)
@@ -33,7 +33,7 @@ func newPtrUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (Unmarshaler, err
 func (p *ptrUnmarshaler) Unmarshal(v reflect.Value, a []string, opts *UnmarshalOptions) error {
 	t := v.Type()
 	if t != p.Type {
-		return &wrongTypeError{Actual: t, Expected: p.Type}
+		return &WrongTypeError{Actual: t, Expected: p.Type}
 	}
 	if v.IsNil() {
 		v.Set(reflect.New(p.ElemType))
@@ -49,7 +49,7 @@ type arrayUnmarshaler struct {
 
 func newArrayUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (Unmarshaler, error) {
 	if t.Kind() != reflect.Array {
-		return nil, &wrongKindError{Expected: reflect.Array, Actual: t}
+		return nil, &WrongKindError{Expected: reflect.Array, Actual: t}
 	}
 
 	eu, err := opts.UnmarshalerFactory.Unmarshaler(t.Elem(), opts)
@@ -66,7 +66,7 @@ func newArrayUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (Unmarshaler, e
 func (p *arrayUnmarshaler) Unmarshal(v reflect.Value, a []string, opts *UnmarshalOptions) error {
 	t := v.Type()
 	if t != p.Type {
-		return &wrongTypeError{Actual: t, Expected: p.Type}
+		return &WrongTypeError{Actual: t, Expected: p.Type}
 	}
 
 	if a == nil {
@@ -91,7 +91,7 @@ type sliceUnmarshaler struct {
 
 func newSliceUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (Unmarshaler, error) {
 	if t.Kind() != reflect.Slice {
-		return nil, &wrongKindError{Expected: reflect.Slice, Actual: t}
+		return nil, &WrongKindError{Expected: reflect.Slice, Actual: t}
 	}
 
 	eu, err := opts.UnmarshalerFactory.Unmarshaler(t.Elem(), opts)
@@ -107,7 +107,7 @@ func newSliceUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (Unmarshaler, e
 func (p *sliceUnmarshaler) Unmarshal(v reflect.Value, a []string, opts *UnmarshalOptions) error {
 	t := v.Type()
 	if t != p.Type {
-		return &wrongTypeError{Actual: t, Expected: p.Type}
+		return &WrongTypeError{Actual: t, Expected: p.Type}
 	}
 
 	if v.IsNil() {
@@ -128,7 +128,7 @@ func (p *sliceUnmarshaler) Unmarshal(v reflect.Value, a []string, opts *Unmarsha
 // underlying type (kind) of string.
 func unmarshalString(v reflect.Value, s string, opts *UnmarshalOptions) error {
 	if v.Kind() != reflect.String {
-		return &wrongKindError{Expected: reflect.String, Actual: v.Type()}
+		return &WrongKindError{Expected: reflect.String, Actual: v.Type()}
 	}
 	v.SetString(s)
 	return nil
@@ -138,7 +138,7 @@ func unmarshalString(v reflect.Value, s string, opts *UnmarshalOptions) error {
 // underlying type (kind) of bool.
 func unmarshalBool(v reflect.Value, s string, opts *UnmarshalOptions) error {
 	if v.Kind() != reflect.Bool {
-		return &wrongKindError{Expected: reflect.Bool, Actual: v.Type()}
+		return &WrongKindError{Expected: reflect.Bool, Actual: v.Type()}
 	}
 	b, err := strconv.ParseBool(s)
 	if err != nil {
@@ -164,7 +164,7 @@ func unmarshalInt(v reflect.Value, s string, opts *UnmarshalOptions) error {
 	case reflect.Int64:
 		bitSize = 64
 	default:
-		return &wrongKindError{Expected: reflect.Int, Actual: v.Type()}
+		return &WrongKindError{Expected: reflect.Int, Actual: v.Type()}
 	}
 
 	i, err := strconv.ParseInt(s, 0, bitSize)
@@ -192,7 +192,7 @@ func unmarshalUint(v reflect.Value, s string, opts *UnmarshalOptions) error {
 	case reflect.Uint64:
 		bitSize = 64
 	default:
-		return &wrongKindError{Expected: reflect.Uint, Actual: v.Type()}
+		return &WrongKindError{Expected: reflect.Uint, Actual: v.Type()}
 	}
 
 	i, err := strconv.ParseUint(s, 0, bitSize)
@@ -213,7 +213,7 @@ func unmarshalFloat(v reflect.Value, s string, opts *UnmarshalOptions) error {
 	case reflect.Float64:
 		bitSize = 64
 	default:
-		return &wrongKindError{Expected: reflect.Float32, Actual: v.Type()}
+		return &WrongKindError{Expected: reflect.Float32, Actual: v.Type()}
 	}
 
 	f, err := strconv.ParseFloat(s, bitSize)
@@ -228,7 +228,7 @@ func unmarshalFloat(v reflect.Value, s string, opts *UnmarshalOptions) error {
 func unmarshalTime(v reflect.Value, s string, opts *UnmarshalOptions) error {
 	t := v.Type()
 	if t != timeType {
-		return &wrongTypeError{Actual: t, Expected: timeType}
+		return &WrongTypeError{Actual: t, Expected: timeType}
 	}
 
 	tm, err := time.Parse(time.RFC3339, s)
@@ -242,7 +242,7 @@ func unmarshalTime(v reflect.Value, s string, opts *UnmarshalOptions) error {
 func unmarshalURL(v reflect.Value, s string, opts *UnmarshalOptions) error {
 	t := v.Type()
 	if t != urlType {
-		return &wrongTypeError{Actual: t, Expected: urlType}
+		return &WrongTypeError{Actual: t, Expected: urlType}
 	}
 
 	u, err := url.Parse(s)

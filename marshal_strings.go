@@ -15,7 +15,7 @@ type ptrMarshaler struct {
 
 func newPtrMarshaler(t reflect.Type, opts *MarshalOptions) (Marshaler, error) {
 	if t.Kind() != reflect.Ptr {
-		return nil, &wrongKindError{Expected: reflect.Ptr, Actual: t}
+		return nil, &WrongKindError{Expected: reflect.Ptr, Actual: t}
 	}
 	et := t.Elem()
 	em, err := opts.MarshalerFactory.Marshaler(et, opts)
@@ -31,7 +31,7 @@ func newPtrMarshaler(t reflect.Type, opts *MarshalOptions) (Marshaler, error) {
 func (p *ptrMarshaler) Marshal(v reflect.Value, opts *MarshalOptions) ([]string, error) {
 	t := v.Type()
 	if t != p.Type {
-		return nil, &wrongTypeError{Actual: t, Expected: p.Type}
+		return nil, &WrongTypeError{Actual: t, Expected: p.Type}
 	}
 	if v.IsNil() {
 		return nil, nil
@@ -47,7 +47,7 @@ type arrayAndSliceMarshaler struct {
 func newArrayAndSliceMarshaler(t reflect.Type, opts *MarshalOptions) (Marshaler, error) {
 	k := t.Kind()
 	if k != reflect.Array && k != reflect.Slice {
-		return nil, &wrongKindError{Expected: reflect.Array, Actual: t}
+		return nil, &WrongKindError{Expected: reflect.Array, Actual: t}
 	}
 
 	em, err := opts.MarshalerFactory.Marshaler(t.Elem(), opts)
@@ -63,7 +63,7 @@ func newArrayAndSliceMarshaler(t reflect.Type, opts *MarshalOptions) (Marshaler,
 func (p *arrayAndSliceMarshaler) Marshal(v reflect.Value, opts *MarshalOptions) ([]string, error) {
 	t := v.Type()
 	if t != p.Type {
-		return nil, &wrongTypeError{Actual: t, Expected: p.Type}
+		return nil, &WrongTypeError{Actual: t, Expected: p.Type}
 	}
 
 	vlen := v.Len()
@@ -87,14 +87,14 @@ func (p *arrayAndSliceMarshaler) Marshal(v reflect.Value, opts *MarshalOptions) 
 
 func marshalString(v reflect.Value, opts *MarshalOptions) (string, error) {
 	if v.Kind() != reflect.String {
-		return "", &wrongKindError{Expected: reflect.String, Actual: v.Type()}
+		return "", &WrongKindError{Expected: reflect.String, Actual: v.Type()}
 	}
 	return v.String(), nil
 }
 
 func marshalBool(v reflect.Value, opts *MarshalOptions) (string, error) {
 	if v.Kind() != reflect.Bool {
-		return "", &wrongKindError{Expected: reflect.Bool, Actual: v.Type()}
+		return "", &WrongKindError{Expected: reflect.Bool, Actual: v.Type()}
 	}
 	return strconv.FormatBool(v.Bool()), nil
 }
@@ -104,7 +104,7 @@ func marshalInt(v reflect.Value, opts *MarshalOptions) (string, error) {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return strconv.FormatInt(v.Int(), 10), nil
 	default:
-		return "", &wrongKindError{Expected: reflect.Int, Actual: v.Type()}
+		return "", &WrongKindError{Expected: reflect.Int, Actual: v.Type()}
 	}
 }
 
@@ -113,7 +113,7 @@ func marshalUint(v reflect.Value, opts *MarshalOptions) (string, error) {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		return strconv.FormatUint(v.Uint(), 10), nil
 	default:
-		return "", &wrongKindError{Expected: reflect.Uint, Actual: v.Type()}
+		return "", &WrongKindError{Expected: reflect.Uint, Actual: v.Type()}
 	}
 }
 
@@ -126,7 +126,7 @@ func marshalFloat(v reflect.Value, opts *MarshalOptions) (string, error) {
 	case reflect.Float64:
 		bitSize = 64
 	default:
-		return "", &wrongKindError{Expected: reflect.Float32, Actual: v.Type()}
+		return "", &WrongKindError{Expected: reflect.Float32, Actual: v.Type()}
 	}
 
 	return strconv.FormatFloat(v.Float(), 'f', -1, bitSize), nil
@@ -135,7 +135,7 @@ func marshalFloat(v reflect.Value, opts *MarshalOptions) (string, error) {
 func marshalTime(v reflect.Value, opts *MarshalOptions) (string, error) {
 	t := v.Type()
 	if t != timeType {
-		return "", &wrongTypeError{Actual: t, Expected: timeType}
+		return "", &WrongTypeError{Actual: t, Expected: timeType}
 	}
 	return v.Interface().(time.Time).Format(time.RFC3339), nil
 }
@@ -143,7 +143,7 @@ func marshalTime(v reflect.Value, opts *MarshalOptions) (string, error) {
 func marshalURL(v reflect.Value, opts *MarshalOptions) (string, error) {
 	t := v.Type()
 	if t != urlType {
-		return "", &wrongTypeError{Actual: t, Expected: urlType}
+		return "", &WrongTypeError{Actual: t, Expected: urlType}
 	}
 	u := v.Interface().(url.URL)
 	return u.String(), nil

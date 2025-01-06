@@ -77,7 +77,7 @@ func (p *marshalerFactory) Marshaler(t reflect.Type, opts *MarshalOptions) (Mars
 		return marshaler, nil
 	}
 
-	return nil, &unhandledTypeError{Type: t}
+	return nil, &UnhandledTypeError{Type: t}
 }
 
 func (p *marshalerFactory) RegisterSubFactory(k reflect.Kind, fn MarshalerFactoryFunc) error {

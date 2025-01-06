@@ -86,7 +86,7 @@ func (p *unmarshalerFactory) Unmarshaler(t reflect.Type, opts *UnmarshalOptions)
 		return unmarshaler, nil
 	}
 
-	return nil, &unhandledTypeError{Type: t}
+	return nil, &UnhandledTypeError{Type: t}
 }
 
 func (p *unmarshalerFactory) RegisterSubFactory(k reflect.Kind, fn UnmarshalerFactoryFunc) error {

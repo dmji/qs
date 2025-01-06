@@ -33,7 +33,7 @@ type fieldUnmarshaler struct {
 // newStructUnmarshaler creates a struct unmarshaler for a specific struct type.
 func newStructUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error) {
 	if t.Kind() != reflect.Struct {
-		return nil, &wrongKindError{Expected: reflect.Struct, Actual: t}
+		return nil, &WrongKindError{Expected: reflect.Struct, Actual: t}
 	}
 
 	su := &structUnmarshaler{
@@ -91,7 +91,7 @@ func newFieldUnmarshaler(sf reflect.StructField, opts *UnmarshalOptions) (vum Va
 func (p *structUnmarshaler) UnmarshalValues(v reflect.Value, vs url.Values, opts *UnmarshalOptions) error {
 	t := v.Type()
 	if t != p.Type {
-		return &wrongTypeError{Actual: t, Expected: p.Type}
+		return &WrongTypeError{Actual: t, Expected: p.Type}
 	}
 
 	// TODO: use a StructError error type in the function to generate
@@ -101,7 +101,7 @@ func (p *structUnmarshaler) UnmarshalValues(v reflect.Value, vs url.Values, opts
 		a, ok := vs[fum.Tag.Name]
 		if !ok {
 			if fum.Tag.UnmarshalPresence == UnmarshalPresenceReq {
-				return &reqError{
+				return &ReqError{
 					Message:   fmt.Sprintf("missing required field %q in struct %v", fum.Tag.Name, t),
 					FieldName: fum.Tag.Name,
 				}
@@ -121,7 +121,7 @@ func (p *structUnmarshaler) UnmarshalValues(v reflect.Value, vs url.Values, opts
 		if err != nil {
 			if _, ok := IsRequiredFieldError(err); ok {
 				name := t.Field(ef.FieldIndex).Name
-				return &reqError{
+				return &ReqError{
 					Message:   fmt.Sprintf("embedded field %q :: %v", name, err),
 					FieldName: name,
 				}
@@ -141,7 +141,7 @@ type mapUnmarshaler struct {
 
 func newMapUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error) {
 	if t.Kind() != reflect.Map {
-		return nil, &wrongKindError{Expected: reflect.Map, Actual: t}
+		return nil, &WrongKindError{Expected: reflect.Map, Actual: t}
 	}
 
 	if t.Key() != stringType {
@@ -166,7 +166,7 @@ func newMapUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshale
 func (p *mapUnmarshaler) UnmarshalValues(v reflect.Value, vs url.Values, opts *UnmarshalOptions) error {
 	t := v.Type()
 	if t != p.Type {
-		return &wrongTypeError{Actual: t, Expected: p.Type}
+		return &WrongTypeError{Actual: t, Expected: p.Type}
 	}
 
 	if v.IsNil() {
@@ -193,7 +193,7 @@ type ptrValuesUnmarshaler struct {
 
 func newPtrValuesUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error) {
 	if t.Kind() != reflect.Ptr {
-		return nil, &wrongKindError{Expected: reflect.Ptr, Actual: t}
+		return nil, &WrongKindError{Expected: reflect.Ptr, Actual: t}
 	}
 	et := t.Elem()
 	eu, err := opts.ValuesUnmarshalerFactory.ValuesUnmarshaler(et, opts)
@@ -210,7 +210,7 @@ func newPtrValuesUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnma
 func (p *ptrValuesUnmarshaler) UnmarshalValues(v reflect.Value, vs url.Values, opts *UnmarshalOptions) error {
 	t := v.Type()
 	if t != p.Type {
-		return &wrongTypeError{Actual: t, Expected: p.Type}
+		return &WrongTypeError{Actual: t, Expected: p.Type}
 	}
 	if v.IsNil() {
 		v.Set(reflect.New(p.ElemType))

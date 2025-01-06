@@ -33,7 +33,7 @@ type fieldMarshaler struct {
 // newStructMarshaler creates a struct marshaler for a specific struct type.
 func newStructMarshaler(t reflect.Type, opts *MarshalOptions) (ValuesMarshaler, error) {
 	if t.Kind() != reflect.Struct {
-		return nil, &wrongKindError{Expected: reflect.Struct, Actual: t}
+		return nil, &WrongKindError{Expected: reflect.Struct, Actual: t}
 	}
 
 	sm := &structMarshaler{
@@ -91,7 +91,7 @@ func newFieldMarshaler(sf reflect.StructField, opts *MarshalOptions) (vm ValuesM
 func (p *structMarshaler) MarshalValues(v reflect.Value, opts *MarshalOptions) (url.Values, error) {
 	t := v.Type()
 	if t != p.Type {
-		return nil, &wrongTypeError{Actual: t, Expected: p.Type}
+		return nil, &WrongTypeError{Actual: t, Expected: p.Type}
 	}
 
 	// TODO: use a StructError error type in the function to generate
@@ -152,7 +152,7 @@ type mapMarshaler struct {
 
 func newMapMarshaler(t reflect.Type, opts *MarshalOptions) (ValuesMarshaler, error) {
 	if t.Kind() != reflect.Map {
-		return nil, &wrongKindError{Expected: reflect.Map, Actual: t}
+		return nil, &WrongKindError{Expected: reflect.Map, Actual: t}
 	}
 
 	if t.Key() != stringType {
@@ -176,7 +176,7 @@ func newMapMarshaler(t reflect.Type, opts *MarshalOptions) (ValuesMarshaler, err
 func (p *mapMarshaler) MarshalValues(v reflect.Value, opts *MarshalOptions) (url.Values, error) {
 	t := v.Type()
 	if t != p.Type {
-		return nil, &wrongTypeError{Actual: t, Expected: p.Type}
+		return nil, &WrongTypeError{Actual: t, Expected: p.Type}
 	}
 
 	vlen := v.Len()
@@ -207,7 +207,7 @@ type ptrValuesMarshaler struct {
 
 func newPtrValuesMarshaler(t reflect.Type, opts *MarshalOptions) (ValuesMarshaler, error) {
 	if t.Kind() != reflect.Ptr {
-		return nil, &wrongKindError{Expected: reflect.Ptr, Actual: t}
+		return nil, &WrongKindError{Expected: reflect.Ptr, Actual: t}
 	}
 	et := t.Elem()
 	em, err := opts.ValuesMarshalerFactory.ValuesMarshaler(et, opts)
@@ -223,7 +223,7 @@ func newPtrValuesMarshaler(t reflect.Type, opts *MarshalOptions) (ValuesMarshale
 func (p *ptrValuesMarshaler) MarshalValues(v reflect.Value, opts *MarshalOptions) (url.Values, error) {
 	t := v.Type()
 	if t != p.Type {
-		return nil, &wrongTypeError{Actual: t, Expected: p.Type}
+		return nil, &WrongTypeError{Actual: t, Expected: p.Type}
 	}
 	if v.IsNil() {
 		return nil, nil
