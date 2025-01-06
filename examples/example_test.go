@@ -3,7 +3,7 @@ package qs_test
 import (
 	"fmt"
 
-	"github.com/pasztorpisti/qs"
+	"github.com/dmji/qs"
 )
 
 type Query struct {

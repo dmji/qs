@@ -3,7 +3,7 @@ package qs_test
 import (
 	"fmt"
 
-	"github.com/pasztorpisti/qs"
+	"github.com/dmji/qs"
 )
 
 // A struct field tag can mark a field with one of the keepempty and omitempty

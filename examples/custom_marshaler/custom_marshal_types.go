@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/pasztorpisti/qs"
+	"github.com/dmji/qs"
 )
 
 var (

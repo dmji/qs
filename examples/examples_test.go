@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"sort"
 
-	"github.com/pasztorpisti/qs"
+	"github.com/dmji/qs"
 )
 
 func ExampleMarshal() {

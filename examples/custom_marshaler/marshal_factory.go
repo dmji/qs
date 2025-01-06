@@ -3,7 +3,7 @@ package custom_marshaler
 import (
 	"reflect"
 
-	"github.com/pasztorpisti/qs"
+	"github.com/dmji/qs"
 )
 
 // marshalerFactory implements the MarshalerFactory interface and provides

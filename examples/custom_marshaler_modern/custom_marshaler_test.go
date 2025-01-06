@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pasztorpisti/qs"
+	"github.com/dmji/qs"
 )
 
 // This example shows how to create QSMarshaler and QSUnmarshaler objects
