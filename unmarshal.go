@@ -46,20 +46,29 @@ type UnmarshalOptions struct {
 
 	// DefaultUnmarshalPresence is used for the unmarshaling of struct fields
 	// that don't have an explicit UnmarshalPresence option set in their tags.
-	DefaultUnmarshalPresence UnmarshalPresence
+	_DefaultUnmarshalPresence UnmarshalPresence
 }
 
 // QSUnmarshaler objects can be created by calling NewUnmarshaler and they can be
 // used to unmarshal query strings or url.Values into structs or maps.
 type QSUnmarshaler struct {
 	opts *UnmarshalOptions
+
+	_ParseQuery func(query string) (url.Values, error)
 }
 
 // NewUnmarshaler returns a new QSUnmarshaler object.
-func NewUnmarshaler(opts *UnmarshalOptions) *QSUnmarshaler {
-	return &QSUnmarshaler{
-		opts: prepareUnmarshalOptions(*opts),
+func NewUnmarshaler(prm *UnmarshalOptions, opts ...func(p *QSUnmarshaler)) *QSUnmarshaler {
+	p := &QSUnmarshaler{
+		opts:        prepareUnmarshalOptions(*prm),
+		_ParseQuery: url.ParseQuery,
 	}
+
+	for _, opt := range opts {
+		opt(p)
+	}
+
+	return p
 }
 
 func (p *QSUnmarshaler) RegisterSubFactory(k reflect.Kind, fn UnmarshalerFactoryFunc) error {
@@ -79,7 +88,7 @@ func (p *QSUnmarshaler) RegisterKindOverride(k reflect.Kind, fn PrimitiveUnmarsh
 // Unmarshal unmarshals an object from a query string.
 // See the documentation of the global Unmarshal func.
 func (p *QSUnmarshaler) Unmarshal(into interface{}, queryString string) error {
-	values, err := url.ParseQuery(queryString)
+	values, err := p._ParseQuery(queryString)
 	if err != nil {
 		return fmt.Errorf("error parsing query string %q :: %v", queryString, err)
 	}
@@ -161,8 +170,8 @@ func prepareUnmarshalOptions(opts UnmarshalOptions) *UnmarshalOptions {
 	}
 	opts.UnmarshalerFactory = newUnmarshalerCache(opts.UnmarshalerFactory)
 
-	if opts.DefaultUnmarshalPresence == UnmarshalPresenceUPUnspecified {
-		opts.DefaultUnmarshalPresence = UnmarshalPresenceOpt
+	if opts._DefaultUnmarshalPresence == UnmarshalPresenceUPUnspecified {
+		opts._DefaultUnmarshalPresence = UnmarshalPresenceOpt
 	}
 	return &opts
 }

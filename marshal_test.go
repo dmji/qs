@@ -529,9 +529,7 @@ func TestDefaultKeepEmpty(t *testing.T) {
 }
 
 func TestDefaultOmitEmpty(t *testing.T) {
-	marshaler := NewMarshaler(&MarshalOptions{
-		DefaultMarshalPresence: MarshalPresenceOmitEmpty,
-	})
+	marshaler := NewMarshaler(&MarshalOptions{}, WithMarshalPresence(MarshalPresenceOmitEmpty))
 
 	var i int = 42
 	// default presence: omitempty, struct presence: unspecified, fields: nozero
@@ -794,9 +792,7 @@ func TestMarshalMap(t *testing.T) {
 	}
 
 	{
-		marshaler := NewMarshaler(&MarshalOptions{
-			DefaultMarshalPresence: MarshalPresenceOmitEmpty,
-		})
+		marshaler := NewMarshaler(&MarshalOptions{}, WithMarshalPresence(MarshalPresenceOmitEmpty))
 
 		// default presence: omitempty
 		vs, err := marshaler.MarshalValues(m)

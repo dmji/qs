@@ -32,3 +32,9 @@ const (
 	// missing fields after unmarshaling.
 	UnmarshalPresenceReq
 )
+
+func WithUnmarshalPresence(presence UnmarshalPresence) func(*QSUnmarshaler) {
+	return func(m *QSUnmarshaler) {
+		m.opts._DefaultUnmarshalPresence = presence
+	}
+}

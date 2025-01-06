@@ -63,7 +63,7 @@ func newStructUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarsh
 }
 
 func newFieldUnmarshaler(sf reflect.StructField, opts *UnmarshalOptions) (vum ValuesUnmarshaler, fum *fieldUnmarshaler, err error) {
-	tag, err := getStructFieldInfo(sf, opts.NameTransformer, MarshalPresenceMPUnspecified, opts.DefaultUnmarshalPresence)
+	tag, err := getStructFieldInfo(sf, opts.NameTransformer, MarshalPresenceMPUnspecified, opts._DefaultUnmarshalPresence)
 	if tag == nil || err != nil {
 		return
 	}

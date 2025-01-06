@@ -57,3 +57,23 @@ func CheckUnmarshal(into interface{}) error {
 func CheckUnmarshalType(t reflect.Type) error {
 	return DefaultUnmarshaler.CheckUnmarshalType(t)
 }
+
+func RegisterSubFactoryUnmarshaler(k reflect.Kind, fn UnmarshalerFactoryFunc) error {
+	return DefaultUnmarshaler.opts.UnmarshalerFactory.RegisterSubFactory(k, fn)
+
+}
+
+func RegisterCustomTypeUnmarshaler(k reflect.Type, fn PrimitiveUnmarshalerFunc) error {
+	return DefaultUnmarshaler.opts.UnmarshalerFactory.RegisterCustomType(k, fn)
+
+}
+
+func RegisterKindOverrideUnmarshaler(k reflect.Kind, fn PrimitiveUnmarshalerFunc) error {
+	return DefaultUnmarshaler.opts.UnmarshalerFactory.RegisterKindOverride(k, fn)
+}
+
+func ApplyOptionsUnmarshal(opts ...func(*QSUnmarshaler)) {
+	for _, opt := range opts {
+		opt(DefaultUnmarshaler)
+	}
+}

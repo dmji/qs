@@ -14,9 +14,7 @@ import (
 // one of the Nil/Opt/Req options when calling NewUnmarshaler but this example
 // doesn't demonstrate that.
 func Example_defaultOmitEmpty() {
-	customMarshaler := qs.NewMarshaler(&qs.MarshalOptions{
-		DefaultMarshalPresence: qs.MarshalPresenceOmitEmpty,
-	})
+	customMarshaler := qs.NewMarshaler(&qs.MarshalOptions{}, qs.WithMarshalPresence(qs.MarshalPresenceOmitEmpty))
 
 	type Query struct {
 		Default   string

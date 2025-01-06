@@ -30,20 +30,29 @@ type MarshalOptions struct {
 	// don't have an explicit MarshalPresence option set in their tags.
 	// This option is used for every item when you marshal a map[string]WhateverType
 	// instead of a struct because map items can't have a tag to override this.
-	DefaultMarshalPresence MarshalPresence
+	_DefaultMarshalPresence MarshalPresence
 }
 
 // QSMarshaler objects can be created by calling NewMarshaler and they can be
 // used to marshal structs or maps into query strings or url.Values.
 type QSMarshaler struct {
 	opts *MarshalOptions
+
+	_EncodeValues func(values url.Values) string
 }
 
 // NewMarshaler returns a new QSMarshaler object.
-func NewMarshaler(opts *MarshalOptions) *QSMarshaler {
-	return &QSMarshaler{
-		opts: prepareMarshalOptions(*opts),
+func NewMarshaler(prm *MarshalOptions, opts ...func(*QSMarshaler)) *QSMarshaler {
+	p := &QSMarshaler{
+		opts:          prepareMarshalOptions(*prm),
+		_EncodeValues: func(values url.Values) string { return values.Encode() },
 	}
+
+	for _, opt := range opts {
+		opt(p)
+	}
+
+	return p
 }
 
 func (p *QSMarshaler) RegisterSubFactory(k reflect.Kind, fn MarshalerFactoryFunc) error {
@@ -67,7 +76,7 @@ func (p *QSMarshaler) Marshal(i interface{}) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return values.Encode(), nil
+	return p._EncodeValues(values), nil
 }
 
 // MarshalValues marshals a given object into a url.Values.
@@ -118,6 +127,7 @@ func NewDefaultMarshalOptions() *MarshalOptions {
 }
 
 func prepareMarshalOptions(opts MarshalOptions) *MarshalOptions {
+
 	if opts.NameTransformer == nil {
 		opts.NameTransformer = snakeCase
 	}
@@ -132,8 +142,8 @@ func prepareMarshalOptions(opts MarshalOptions) *MarshalOptions {
 	}
 	opts.MarshalerFactory = newMarshalerCache(opts.MarshalerFactory)
 
-	if opts.DefaultMarshalPresence == MarshalPresenceMPUnspecified {
-		opts.DefaultMarshalPresence = MarshalPresenceKeepEmpty
+	if opts._DefaultMarshalPresence == MarshalPresenceMPUnspecified {
+		opts._DefaultMarshalPresence = MarshalPresenceKeepEmpty
 	}
 	return &opts
 }

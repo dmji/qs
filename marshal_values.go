@@ -63,7 +63,7 @@ func newStructMarshaler(t reflect.Type, opts *MarshalOptions) (ValuesMarshaler, 
 }
 
 func newFieldMarshaler(sf reflect.StructField, opts *MarshalOptions) (vm ValuesMarshaler, fm *fieldMarshaler, err error) {
-	tag, err := getStructFieldInfo(sf, opts.NameTransformer, opts.DefaultMarshalPresence, UnmarshalPresenceUPUnspecified)
+	tag, err := getStructFieldInfo(sf, opts.NameTransformer, opts._DefaultMarshalPresence, UnmarshalPresenceUPUnspecified)
 	if tag == nil || err != nil {
 		return
 	}
@@ -187,7 +187,7 @@ func (p *mapMarshaler) MarshalValues(v reflect.Value, opts *MarshalOptions) (url
 	vs := make(url.Values, vlen)
 	for _, key := range v.MapKeys() {
 		val := v.MapIndex(key)
-		if opts.DefaultMarshalPresence == MarshalPresenceOmitEmpty && isEmpty(val) {
+		if opts._DefaultMarshalPresence == MarshalPresenceOmitEmpty && isEmpty(val) {
 			continue
 		}
 		keyStr := key.String()

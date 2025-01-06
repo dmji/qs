@@ -83,3 +83,23 @@ func CheckMarshal(i interface{}) error {
 func CheckMarshalType(t reflect.Type) error {
 	return DefaultMarshaler.CheckMarshalType(t)
 }
+
+func RegisterSubFactoryMarshal(k reflect.Kind, fn MarshalerFactoryFunc) error {
+	return DefaultMarshaler.opts.MarshalerFactory.RegisterSubFactory(k, fn)
+
+}
+
+func RegisterCustomTypeMarshal(k reflect.Type, fn PrimitiveMarshalerFunc) error {
+	return DefaultMarshaler.opts.MarshalerFactory.RegisterCustomType(k, fn)
+
+}
+
+func RegisterKindOverrideMarshal(k reflect.Kind, fn PrimitiveMarshalerFunc) error {
+	return DefaultMarshaler.opts.MarshalerFactory.RegisterKindOverride(k, fn)
+}
+
+func ApplyOptionsMarshal(opts ...func(*QSMarshaler)) {
+	for _, opt := range opts {
+		opt(DefaultMarshaler)
+	}
+}
