@@ -62,10 +62,13 @@ func newStructMarshaler(t reflect.Type, opts *MarshalOptions) (ValuesMarshaler, 
 	return sm, nil
 }
 
-func newFieldMarshaler(sf reflect.StructField, opts *MarshalOptions) (vm ValuesMarshaler, fm *fieldMarshaler, err error) {
+func newFieldMarshaler(sf reflect.StructField, opts *MarshalOptions) (ValuesMarshaler, *fieldMarshaler, error) {
+	var vm ValuesMarshaler
+	var fm *fieldMarshaler
+
 	tag, err := getStructFieldInfo(sf, opts.NameTransformer, opts._DefaultMarshalPresence, UnmarshalPresenceUPUnspecified)
 	if tag == nil || err != nil {
-		return
+		return vm, fm, err
 	}
 
 	t := sf.Type
@@ -73,19 +76,19 @@ func newFieldMarshaler(sf reflect.StructField, opts *MarshalOptions) (vm ValuesM
 		vm, err = opts.ValuesMarshalerFactory.ValuesMarshaler(t, opts)
 		if err == nil {
 			// We can end up here for example in case of an embedded struct.
-			return
+			return vm, fm, err
 		}
 	}
 
 	m, err := opts.MarshalerFactory.Marshaler(t, opts)
 	if err != nil {
-		return
+		return vm, fm, err
 	}
 	fm = &fieldMarshaler{
 		Marshaler: m,
 		Tag:       tag,
 	}
-	return
+	return vm, fm, err
 }
 
 func (p *structMarshaler) MarshalValues(v reflect.Value, opts *MarshalOptions) (url.Values, error) {

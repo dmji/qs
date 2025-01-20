@@ -8,7 +8,7 @@ import (
 // IsRequiredFieldError returns ok==false if the given error wasn't caused by a
 // required field that was missing from the query string.
 // Otherwise it returns the name of the missing required field with ok==true.
-func IsRequiredFieldError(e error) (fieldName string, ok bool) {
+func IsRequiredFieldError(e error) (string, bool) {
 	if re, ok := e.(*ReqError); ok {
 		return re.FieldName, true
 	}

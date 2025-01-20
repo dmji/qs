@@ -62,10 +62,13 @@ func newStructUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarsh
 	return su, nil
 }
 
-func newFieldUnmarshaler(sf reflect.StructField, opts *UnmarshalOptions) (vum ValuesUnmarshaler, fum *fieldUnmarshaler, err error) {
+func newFieldUnmarshaler(sf reflect.StructField, opts *UnmarshalOptions) (ValuesUnmarshaler, *fieldUnmarshaler, error) {
+	var vum ValuesUnmarshaler
+	var fum *fieldUnmarshaler
+
 	tag, err := getStructFieldInfo(sf, opts.NameTransformer, MarshalPresenceMPUnspecified, opts.DefaultUnmarshalPresence)
 	if tag == nil || err != nil {
-		return
+		return vum, fum, err
 	}
 
 	t := sf.Type
@@ -73,19 +76,19 @@ func newFieldUnmarshaler(sf reflect.StructField, opts *UnmarshalOptions) (vum Va
 		vum, err = opts.ValuesUnmarshalerFactory.ValuesUnmarshaler(t, opts)
 		if err == nil {
 			// We can end up here for example in case of an embedded struct.
-			return
+			return vum, fum, err
 		}
 	}
 
 	um, err := opts.UnmarshalerFactory.Unmarshaler(t, opts)
 	if err != nil {
-		return
+		return vum, fum, err
 	}
 	fum = &fieldUnmarshaler{
 		Unmarshaler: um,
 		Tag:         tag,
 	}
-	return
+	return vum, fum, err
 }
 
 func (p *structUnmarshaler) UnmarshalValues(v reflect.Value, vs url.Values, opts *UnmarshalOptions) error {
