@@ -44,7 +44,7 @@ type UnmarshalOptions struct {
 
 	// DefaultUnmarshalPresence is used for the unmarshaling of struct fields
 	// that don't have an explicit UnmarshalPresence option set in their tags.
-	_DefaultUnmarshalPresence UnmarshalPresence
+	DefaultUnmarshalPresence UnmarshalPresence
 }
 
 // NewDefaultUnmarshalOptions creates a new UnmarshalOptions in which every field
@@ -80,8 +80,8 @@ func prepareUnmarshalOptions(opts UnmarshalOptions) *UnmarshalOptions {
 	}
 	opts.UnmarshalerFactory = newUnmarshalerCache(opts.UnmarshalerFactory)
 
-	if opts._DefaultUnmarshalPresence == UnmarshalPresenceUPUnspecified {
-		opts._DefaultUnmarshalPresence = UnmarshalPresenceOpt
+	if opts.DefaultUnmarshalPresence == UnmarshalPresenceUPUnspecified {
+		opts.DefaultUnmarshalPresence = UnmarshalPresenceOpt
 	}
 	return &opts
 }
@@ -89,7 +89,7 @@ func prepareUnmarshalOptions(opts UnmarshalOptions) *UnmarshalOptions {
 // option appliers
 func WithUnmarshalPresence(presence UnmarshalPresence) func(*QSUnmarshaler) {
 	return func(m *QSUnmarshaler) {
-		m.opts._DefaultUnmarshalPresence = presence
+		m.opts.DefaultUnmarshalPresence = presence
 	}
 }
 
