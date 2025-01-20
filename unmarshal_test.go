@@ -362,246 +362,262 @@ func TestDefaultOpt(t *testing.T) {
 	}, "&")
 
 	// default presence: opt, struct presence: unspecified, queryString: nozero
-	{
-		var us UUnspecified
-		err := Unmarshal(&us, queryString)
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "str")
-			cr.compare("b", us.B, true)
-			cr.compare("i", us.I, -1)
-			cr.compare("i8", us.I8, int8(-8))
-			cr.compare("i16", us.I16, int16(-16))
-			cr.compare("i32", us.I32, int32(-32))
-			cr.compare("i64", us.I64, int64(-64))
-			cr.compare("u", us.U, uint(1))
-			cr.compare("u8", us.U8, uint8(8))
-			cr.compare("u16", us.U16, uint16(16))
-			cr.compare("u32", us.U32, uint32(32))
-			cr.compare("u64", us.U64, uint64(64))
-			cr.compare("f32", us.F32, float32(32.32))
-			cr.compare("f64", us.F64, 64.64)
-			cr.compare("ptr", us.Ptr, 42)
-			cr.compare("array", us.Array, []int{1, 2})
-			cr.compare("slice", us.Slice, []int{3, 4})
-			cr.compare("qs", us.QS, []byte{1, 2, 3})
-			cr.compare("ei", us.EI, 33)
-			if err := cr.finish(); err != nil {
+	t.Run("unspecified zero",
+		func(t *testing.T) {
+			var us UUnspecified
+			err := Unmarshal(&us, queryString)
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "str")
+				cr.compare("b", us.B, true)
+				cr.compare("i", us.I, -1)
+				cr.compare("i8", us.I8, int8(-8))
+				cr.compare("i16", us.I16, int16(-16))
+				cr.compare("i32", us.I32, int32(-32))
+				cr.compare("i64", us.I64, int64(-64))
+				cr.compare("u", us.U, uint(1))
+				cr.compare("u8", us.U8, uint8(8))
+				cr.compare("u16", us.U16, uint16(16))
+				cr.compare("u32", us.U32, uint32(32))
+				cr.compare("u64", us.U64, uint64(64))
+				cr.compare("f32", us.F32, float32(32.32))
+				cr.compare("f64", us.F64, 64.64)
+				cr.compare("ptr", us.Ptr, 42)
+				cr.compare("array", us.Array, []int{1, 2})
+				cr.compare("slice", us.Slice, []int{3, 4})
+				cr.compare("qs", us.QS, []byte{1, 2, 3})
+				cr.compare("ei", us.EI, 33)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: opt, struct presence: unspecified, queryString: zero
-	{
-		var us UUnspecified
-		err := Unmarshal(&us, "")
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "")
-			cr.compare("b", us.B, false)
-			cr.compare("i", us.I, 0)
-			cr.compare("i8", us.I8, int8(0))
-			cr.compare("i16", us.I16, int16(0))
-			cr.compare("i32", us.I32, int32(0))
-			cr.compare("i64", us.I64, int64(0))
-			cr.compare("u", us.U, uint(0))
-			cr.compare("u8", us.U8, uint8(0))
-			cr.compare("u16", us.U16, uint16(0))
-			cr.compare("u32", us.U32, uint32(0))
-			cr.compare("u64", us.U64, uint64(0))
-			cr.compare("f32", us.F32, float32(0.0))
-			cr.compare("f64", us.F64, 0.0)
-			cr.compare("ptr", us.Ptr, 0)
-			cr.compare("array", us.Array, []int{0, 0})
-			cr.compare("slice", us.Slice, []int{})
-			cr.compare("qs", us.QS, []byte{})
-			cr.compare("ei", us.EI, 0)
-			if err := cr.finish(); err != nil {
+	t.Run("unspecified zero",
+		func(t *testing.T) {
+			var us UUnspecified
+			err := Unmarshal(&us, "")
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "")
+				cr.compare("b", us.B, false)
+				cr.compare("i", us.I, 0)
+				cr.compare("i8", us.I8, int8(0))
+				cr.compare("i16", us.I16, int16(0))
+				cr.compare("i32", us.I32, int32(0))
+				cr.compare("i64", us.I64, int64(0))
+				cr.compare("u", us.U, uint(0))
+				cr.compare("u8", us.U8, uint8(0))
+				cr.compare("u16", us.U16, uint16(0))
+				cr.compare("u32", us.U32, uint32(0))
+				cr.compare("u64", us.U64, uint64(0))
+				cr.compare("f32", us.F32, float32(0.0))
+				cr.compare("f64", us.F64, 0.0)
+				cr.compare("ptr", us.Ptr, 0)
+				cr.compare("array", us.Array, []int{0, 0})
+				cr.compare("slice", us.Slice, []int{})
+				cr.compare("qs", us.QS, []byte{})
+				cr.compare("ei", us.EI, 0)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: opt, struct presence: opt, queryString: nozero
-	{
-		var us UOpt
-		err := Unmarshal(&us, queryString)
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "str")
-			cr.compare("b", us.B, true)
-			cr.compare("i", us.I, -1)
-			cr.compare("i8", us.I8, int8(-8))
-			cr.compare("i16", us.I16, int16(-16))
-			cr.compare("i32", us.I32, int32(-32))
-			cr.compare("i64", us.I64, int64(-64))
-			cr.compare("u", us.U, uint(1))
-			cr.compare("u8", us.U8, uint8(8))
-			cr.compare("u16", us.U16, uint16(16))
-			cr.compare("u32", us.U32, uint32(32))
-			cr.compare("u64", us.U64, uint64(64))
-			cr.compare("f32", us.F32, float32(32.32))
-			cr.compare("f64", us.F64, 64.64)
-			cr.compare("ptr", us.Ptr, 42)
-			cr.compare("array", us.Array, []int{1, 2})
-			cr.compare("slice", us.Slice, []int{3, 4})
-			cr.compare("qs", us.QS, []byte{1, 2, 3})
-			cr.compare("ei", us.EI, 33)
-			if err := cr.finish(); err != nil {
+	t.Run("opt nozero",
+		func(t *testing.T) {
+			var us UOpt
+			err := Unmarshal(&us, queryString)
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "str")
+				cr.compare("b", us.B, true)
+				cr.compare("i", us.I, -1)
+				cr.compare("i8", us.I8, int8(-8))
+				cr.compare("i16", us.I16, int16(-16))
+				cr.compare("i32", us.I32, int32(-32))
+				cr.compare("i64", us.I64, int64(-64))
+				cr.compare("u", us.U, uint(1))
+				cr.compare("u8", us.U8, uint8(8))
+				cr.compare("u16", us.U16, uint16(16))
+				cr.compare("u32", us.U32, uint32(32))
+				cr.compare("u64", us.U64, uint64(64))
+				cr.compare("f32", us.F32, float32(32.32))
+				cr.compare("f64", us.F64, 64.64)
+				cr.compare("ptr", us.Ptr, 42)
+				cr.compare("array", us.Array, []int{1, 2})
+				cr.compare("slice", us.Slice, []int{3, 4})
+				cr.compare("qs", us.QS, []byte{1, 2, 3})
+				cr.compare("ei", us.EI, 33)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: opt, struct presence: opt, queryString: zero
-	{
-		var us UOpt
-		err := Unmarshal(&us, "")
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "")
-			cr.compare("b", us.B, false)
-			cr.compare("i", us.I, 0)
-			cr.compare("i8", us.I8, int8(0))
-			cr.compare("i16", us.I16, int16(0))
-			cr.compare("i32", us.I32, int32(0))
-			cr.compare("i64", us.I64, int64(0))
-			cr.compare("u", us.U, uint(0))
-			cr.compare("u8", us.U8, uint8(0))
-			cr.compare("u16", us.U16, uint16(0))
-			cr.compare("u32", us.U32, uint32(0))
-			cr.compare("u64", us.U64, uint64(0))
-			cr.compare("f32", us.F32, float32(0.0))
-			cr.compare("f64", us.F64, 0.0)
-			cr.compare("ptr", us.Ptr, 0)
-			cr.compare("array", us.Array, []int{0, 0})
-			cr.compare("slice", us.Slice, []int{})
-			cr.compare("qs", us.QS, []byte{})
-			cr.compare("ei", us.EI, 0)
-			if err := cr.finish(); err != nil {
+	t.Run("opt zero",
+		func(t *testing.T) {
+			var us UOpt
+			err := Unmarshal(&us, "")
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "")
+				cr.compare("b", us.B, false)
+				cr.compare("i", us.I, 0)
+				cr.compare("i8", us.I8, int8(0))
+				cr.compare("i16", us.I16, int16(0))
+				cr.compare("i32", us.I32, int32(0))
+				cr.compare("i64", us.I64, int64(0))
+				cr.compare("u", us.U, uint(0))
+				cr.compare("u8", us.U8, uint8(0))
+				cr.compare("u16", us.U16, uint16(0))
+				cr.compare("u32", us.U32, uint32(0))
+				cr.compare("u64", us.U64, uint64(0))
+				cr.compare("f32", us.F32, float32(0.0))
+				cr.compare("f64", us.F64, 0.0)
+				cr.compare("ptr", us.Ptr, 0)
+				cr.compare("array", us.Array, []int{0, 0})
+				cr.compare("slice", us.Slice, []int{})
+				cr.compare("qs", us.QS, []byte{})
+				cr.compare("ei", us.EI, 0)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: opt, struct presence: nil, queryString: nozero
-	{
-		var us UNil
-		err := Unmarshal(&us, queryString)
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "str")
-			cr.compare("b", us.B, true)
-			cr.compare("i", us.I, -1)
-			cr.compare("i8", us.I8, int8(-8))
-			cr.compare("i16", us.I16, int16(-16))
-			cr.compare("i32", us.I32, int32(-32))
-			cr.compare("i64", us.I64, int64(-64))
-			cr.compare("u", us.U, uint(1))
-			cr.compare("u8", us.U8, uint8(8))
-			cr.compare("u16", us.U16, uint16(16))
-			cr.compare("u32", us.U32, uint32(32))
-			cr.compare("u64", us.U64, uint64(64))
-			cr.compare("f32", us.F32, float32(32.32))
-			cr.compare("f64", us.F64, 64.64)
-			cr.compare("ptr", us.Ptr, 42)
-			cr.compare("array", us.Array, []int{1, 2})
-			cr.compare("slice", us.Slice, []int{3, 4})
-			cr.compare("qs", us.QS, []byte{1, 2, 3})
-			cr.compare("ei", us.EI, 33)
-			if err := cr.finish(); err != nil {
+	t.Run("nil nozero",
+		func(t *testing.T) {
+			var us UNil
+			err := Unmarshal(&us, queryString)
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "str")
+				cr.compare("b", us.B, true)
+				cr.compare("i", us.I, -1)
+				cr.compare("i8", us.I8, int8(-8))
+				cr.compare("i16", us.I16, int16(-16))
+				cr.compare("i32", us.I32, int32(-32))
+				cr.compare("i64", us.I64, int64(-64))
+				cr.compare("u", us.U, uint(1))
+				cr.compare("u8", us.U8, uint8(8))
+				cr.compare("u16", us.U16, uint16(16))
+				cr.compare("u32", us.U32, uint32(32))
+				cr.compare("u64", us.U64, uint64(64))
+				cr.compare("f32", us.F32, float32(32.32))
+				cr.compare("f64", us.F64, 64.64)
+				cr.compare("ptr", us.Ptr, 42)
+				cr.compare("array", us.Array, []int{1, 2})
+				cr.compare("slice", us.Slice, []int{3, 4})
+				cr.compare("qs", us.QS, []byte{1, 2, 3})
+				cr.compare("ei", us.EI, 33)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: opt, struct presence: nil, queryString: zero
-	{
-		var us UNil
-		err := Unmarshal(&us, "")
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "")
-			cr.compare("b", us.B, false)
-			cr.compare("i", us.I, 0)
-			cr.compare("i8", us.I8, int8(0))
-			cr.compare("i16", us.I16, int16(0))
-			cr.compare("i32", us.I32, int32(0))
-			cr.compare("i64", us.I64, int64(0))
-			cr.compare("u", us.U, uint(0))
-			cr.compare("u8", us.U8, uint8(0))
-			cr.compare("u16", us.U16, uint16(0))
-			cr.compare("u32", us.U32, uint32(0))
-			cr.compare("u64", us.U64, uint64(0))
-			cr.compare("f32", us.F32, float32(0.0))
-			cr.compare("f64", us.F64, 0.0)
-			cr.compare("ptr", us.Ptr, nil)
-			cr.compare("array", us.Array, []int{0, 0})
-			cr.compare("slice", us.Slice, nil)
-			cr.compare("qs", us.QS, nil)
-			cr.compare("ei", us.EI, 0)
-			if err := cr.finish(); err != nil {
+	t.Run("nil zero",
+		func(t *testing.T) {
+			var us UNil
+			err := Unmarshal(&us, "")
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "")
+				cr.compare("b", us.B, false)
+				cr.compare("i", us.I, 0)
+				cr.compare("i8", us.I8, int8(0))
+				cr.compare("i16", us.I16, int16(0))
+				cr.compare("i32", us.I32, int32(0))
+				cr.compare("i64", us.I64, int64(0))
+				cr.compare("u", us.U, uint(0))
+				cr.compare("u8", us.U8, uint8(0))
+				cr.compare("u16", us.U16, uint16(0))
+				cr.compare("u32", us.U32, uint32(0))
+				cr.compare("u64", us.U64, uint64(0))
+				cr.compare("f32", us.F32, float32(0.0))
+				cr.compare("f64", us.F64, 0.0)
+				cr.compare("ptr", us.Ptr, nil)
+				cr.compare("array", us.Array, []int{0, 0})
+				cr.compare("slice", us.Slice, nil)
+				cr.compare("qs", us.QS, nil)
+				cr.compare("ei", us.EI, 0)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: opt, struct presence: req, queryString: nozero
-	{
-		var us UReq
-		err := Unmarshal(&us, queryString)
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "str")
-			cr.compare("b", us.B, true)
-			cr.compare("i", us.I, -1)
-			cr.compare("i8", us.I8, int8(-8))
-			cr.compare("i16", us.I16, int16(-16))
-			cr.compare("i32", us.I32, int32(-32))
-			cr.compare("i64", us.I64, int64(-64))
-			cr.compare("u", us.U, uint(1))
-			cr.compare("u8", us.U8, uint8(8))
-			cr.compare("u16", us.U16, uint16(16))
-			cr.compare("u32", us.U32, uint32(32))
-			cr.compare("u64", us.U64, uint64(64))
-			cr.compare("f32", us.F32, float32(32.32))
-			cr.compare("f64", us.F64, 64.64)
-			cr.compare("ptr", us.Ptr, 42)
-			cr.compare("array", us.Array, []int{1, 2})
-			cr.compare("slice", us.Slice, []int{3, 4})
-			cr.compare("qs", us.QS, []byte{1, 2, 3})
-			cr.compare("ei", us.EI, 33)
-			if err := cr.finish(); err != nil {
+	t.Run("req nozero",
+		func(t *testing.T) {
+			var us UReq
+			err := Unmarshal(&us, queryString)
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "str")
+				cr.compare("b", us.B, true)
+				cr.compare("i", us.I, -1)
+				cr.compare("i8", us.I8, int8(-8))
+				cr.compare("i16", us.I16, int16(-16))
+				cr.compare("i32", us.I32, int32(-32))
+				cr.compare("i64", us.I64, int64(-64))
+				cr.compare("u", us.U, uint(1))
+				cr.compare("u8", us.U8, uint8(8))
+				cr.compare("u16", us.U16, uint16(16))
+				cr.compare("u32", us.U32, uint32(32))
+				cr.compare("u64", us.U64, uint64(64))
+				cr.compare("f32", us.F32, float32(32.32))
+				cr.compare("f64", us.F64, 64.64)
+				cr.compare("ptr", us.Ptr, 42)
+				cr.compare("array", us.Array, []int{1, 2})
+				cr.compare("slice", us.Slice, []int{3, 4})
+				cr.compare("qs", us.QS, []byte{1, 2, 3})
+				cr.compare("ei", us.EI, 33)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: opt, struct presence: req, queryString: zero
-	{
-		var us UReq
-		err := Unmarshal(&us, "")
-		if err == nil {
-			t.Error("unexpected success")
-		} else if _, ok := IsRequiredFieldError(err); !ok {
-			t.Errorf("expected a RequiredFieldError :: %v", err)
-		}
-	}
+	t.Run("req zero",
+		func(t *testing.T) {
+			var us UReq
+			err := Unmarshal(&us, "")
+			if err == nil {
+				t.Error("unexpected success")
+			} else if _, ok := IsRequiredFieldError(err); !ok {
+				t.Errorf("expected a RequiredFieldError :: %v", err)
+			}
+		},
+	)
 }
 
 func TestDefaultNil(t *testing.T) {
@@ -621,246 +637,262 @@ func TestDefaultNil(t *testing.T) {
 	unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceNil))
 
 	// default presence: nil, struct presence: unspecified, queryString: nozero
-	{
-		var us UUnspecified
-		err := unmarshaler.Unmarshal(&us, queryString)
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "str")
-			cr.compare("b", us.B, true)
-			cr.compare("i", us.I, -1)
-			cr.compare("i8", us.I8, int8(-8))
-			cr.compare("i16", us.I16, int16(-16))
-			cr.compare("i32", us.I32, int32(-32))
-			cr.compare("i64", us.I64, int64(-64))
-			cr.compare("u", us.U, uint(1))
-			cr.compare("u8", us.U8, uint8(8))
-			cr.compare("u16", us.U16, uint16(16))
-			cr.compare("u32", us.U32, uint32(32))
-			cr.compare("u64", us.U64, uint64(64))
-			cr.compare("f32", us.F32, float32(32.32))
-			cr.compare("f64", us.F64, 64.64)
-			cr.compare("ptr", us.Ptr, 42)
-			cr.compare("array", us.Array, []int{1, 2})
-			cr.compare("slice", us.Slice, []int{3, 4})
-			cr.compare("qs", us.QS, []byte{1, 2, 3})
-			cr.compare("ei", us.EI, 33)
-			if err := cr.finish(); err != nil {
+	t.Run("unspecified nozero",
+		func(t *testing.T) {
+			var us UUnspecified
+			err := unmarshaler.Unmarshal(&us, queryString)
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "str")
+				cr.compare("b", us.B, true)
+				cr.compare("i", us.I, -1)
+				cr.compare("i8", us.I8, int8(-8))
+				cr.compare("i16", us.I16, int16(-16))
+				cr.compare("i32", us.I32, int32(-32))
+				cr.compare("i64", us.I64, int64(-64))
+				cr.compare("u", us.U, uint(1))
+				cr.compare("u8", us.U8, uint8(8))
+				cr.compare("u16", us.U16, uint16(16))
+				cr.compare("u32", us.U32, uint32(32))
+				cr.compare("u64", us.U64, uint64(64))
+				cr.compare("f32", us.F32, float32(32.32))
+				cr.compare("f64", us.F64, 64.64)
+				cr.compare("ptr", us.Ptr, 42)
+				cr.compare("array", us.Array, []int{1, 2})
+				cr.compare("slice", us.Slice, []int{3, 4})
+				cr.compare("qs", us.QS, []byte{1, 2, 3})
+				cr.compare("ei", us.EI, 33)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: nil, struct presence: unspecified, queryString: zero
-	{
-		var us UUnspecified
-		err := unmarshaler.Unmarshal(&us, "")
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "")
-			cr.compare("b", us.B, false)
-			cr.compare("i", us.I, 0)
-			cr.compare("i8", us.I8, int8(0))
-			cr.compare("i16", us.I16, int16(0))
-			cr.compare("i32", us.I32, int32(0))
-			cr.compare("i64", us.I64, int64(0))
-			cr.compare("u", us.U, uint(0))
-			cr.compare("u8", us.U8, uint8(0))
-			cr.compare("u16", us.U16, uint16(0))
-			cr.compare("u32", us.U32, uint32(0))
-			cr.compare("u64", us.U64, uint64(0))
-			cr.compare("f32", us.F32, float32(0.0))
-			cr.compare("f64", us.F64, 0.0)
-			cr.compare("ptr", us.Ptr, nil)
-			cr.compare("array", us.Array, []int{0, 0})
-			cr.compare("slice", us.Slice, nil)
-			cr.compare("qs", us.QS, nil)
-			cr.compare("ei", us.EI, 0)
-			if err := cr.finish(); err != nil {
+	t.Run("unspecified zero",
+		func(t *testing.T) {
+			var us UUnspecified
+			err := unmarshaler.Unmarshal(&us, "")
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "")
+				cr.compare("b", us.B, false)
+				cr.compare("i", us.I, 0)
+				cr.compare("i8", us.I8, int8(0))
+				cr.compare("i16", us.I16, int16(0))
+				cr.compare("i32", us.I32, int32(0))
+				cr.compare("i64", us.I64, int64(0))
+				cr.compare("u", us.U, uint(0))
+				cr.compare("u8", us.U8, uint8(0))
+				cr.compare("u16", us.U16, uint16(0))
+				cr.compare("u32", us.U32, uint32(0))
+				cr.compare("u64", us.U64, uint64(0))
+				cr.compare("f32", us.F32, float32(0.0))
+				cr.compare("f64", us.F64, 0.0)
+				cr.compare("ptr", us.Ptr, nil)
+				cr.compare("array", us.Array, []int{0, 0})
+				cr.compare("slice", us.Slice, nil)
+				cr.compare("qs", us.QS, nil)
+				cr.compare("ei", us.EI, 0)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: nil, struct presence: opt, queryString: nozero
-	{
-		var us UOpt
-		err := unmarshaler.Unmarshal(&us, queryString)
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "str")
-			cr.compare("b", us.B, true)
-			cr.compare("i", us.I, -1)
-			cr.compare("i8", us.I8, int8(-8))
-			cr.compare("i16", us.I16, int16(-16))
-			cr.compare("i32", us.I32, int32(-32))
-			cr.compare("i64", us.I64, int64(-64))
-			cr.compare("u", us.U, uint(1))
-			cr.compare("u8", us.U8, uint8(8))
-			cr.compare("u16", us.U16, uint16(16))
-			cr.compare("u32", us.U32, uint32(32))
-			cr.compare("u64", us.U64, uint64(64))
-			cr.compare("f32", us.F32, float32(32.32))
-			cr.compare("f64", us.F64, 64.64)
-			cr.compare("ptr", us.Ptr, 42)
-			cr.compare("array", us.Array, []int{1, 2})
-			cr.compare("slice", us.Slice, []int{3, 4})
-			cr.compare("qs", us.QS, []byte{1, 2, 3})
-			cr.compare("ei", us.EI, 33)
-			if err := cr.finish(); err != nil {
+	t.Run("opt nozero",
+		func(t *testing.T) {
+			var us UOpt
+			err := unmarshaler.Unmarshal(&us, queryString)
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "str")
+				cr.compare("b", us.B, true)
+				cr.compare("i", us.I, -1)
+				cr.compare("i8", us.I8, int8(-8))
+				cr.compare("i16", us.I16, int16(-16))
+				cr.compare("i32", us.I32, int32(-32))
+				cr.compare("i64", us.I64, int64(-64))
+				cr.compare("u", us.U, uint(1))
+				cr.compare("u8", us.U8, uint8(8))
+				cr.compare("u16", us.U16, uint16(16))
+				cr.compare("u32", us.U32, uint32(32))
+				cr.compare("u64", us.U64, uint64(64))
+				cr.compare("f32", us.F32, float32(32.32))
+				cr.compare("f64", us.F64, 64.64)
+				cr.compare("ptr", us.Ptr, 42)
+				cr.compare("array", us.Array, []int{1, 2})
+				cr.compare("slice", us.Slice, []int{3, 4})
+				cr.compare("qs", us.QS, []byte{1, 2, 3})
+				cr.compare("ei", us.EI, 33)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: nil, struct presence: opt, queryString: zero
-	{
-		var us UOpt
-		err := unmarshaler.Unmarshal(&us, "")
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "")
-			cr.compare("b", us.B, false)
-			cr.compare("i", us.I, 0)
-			cr.compare("i8", us.I8, int8(0))
-			cr.compare("i16", us.I16, int16(0))
-			cr.compare("i32", us.I32, int32(0))
-			cr.compare("i64", us.I64, int64(0))
-			cr.compare("u", us.U, uint(0))
-			cr.compare("u8", us.U8, uint8(0))
-			cr.compare("u16", us.U16, uint16(0))
-			cr.compare("u32", us.U32, uint32(0))
-			cr.compare("u64", us.U64, uint64(0))
-			cr.compare("f32", us.F32, float32(0.0))
-			cr.compare("f64", us.F64, 0.0)
-			cr.compare("ptr", us.Ptr, 0)
-			cr.compare("array", us.Array, []int{0, 0})
-			cr.compare("slice", us.Slice, []int{})
-			cr.compare("qs", us.QS, []byte{})
-			cr.compare("ei", us.EI, 0)
-			if err := cr.finish(); err != nil {
+	t.Run("opt zero",
+		func(t *testing.T) {
+			var us UOpt
+			err := unmarshaler.Unmarshal(&us, "")
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "")
+				cr.compare("b", us.B, false)
+				cr.compare("i", us.I, 0)
+				cr.compare("i8", us.I8, int8(0))
+				cr.compare("i16", us.I16, int16(0))
+				cr.compare("i32", us.I32, int32(0))
+				cr.compare("i64", us.I64, int64(0))
+				cr.compare("u", us.U, uint(0))
+				cr.compare("u8", us.U8, uint8(0))
+				cr.compare("u16", us.U16, uint16(0))
+				cr.compare("u32", us.U32, uint32(0))
+				cr.compare("u64", us.U64, uint64(0))
+				cr.compare("f32", us.F32, float32(0.0))
+				cr.compare("f64", us.F64, 0.0)
+				cr.compare("ptr", us.Ptr, 0)
+				cr.compare("array", us.Array, []int{0, 0})
+				cr.compare("slice", us.Slice, []int{})
+				cr.compare("qs", us.QS, []byte{})
+				cr.compare("ei", us.EI, 0)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: nil, struct presence: nil, queryString: nozero
-	{
-		var us UNil
-		err := unmarshaler.Unmarshal(&us, queryString)
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "str")
-			cr.compare("b", us.B, true)
-			cr.compare("i", us.I, -1)
-			cr.compare("i8", us.I8, int8(-8))
-			cr.compare("i16", us.I16, int16(-16))
-			cr.compare("i32", us.I32, int32(-32))
-			cr.compare("i64", us.I64, int64(-64))
-			cr.compare("u", us.U, uint(1))
-			cr.compare("u8", us.U8, uint8(8))
-			cr.compare("u16", us.U16, uint16(16))
-			cr.compare("u32", us.U32, uint32(32))
-			cr.compare("u64", us.U64, uint64(64))
-			cr.compare("f32", us.F32, float32(32.32))
-			cr.compare("f64", us.F64, 64.64)
-			cr.compare("ptr", us.Ptr, 42)
-			cr.compare("array", us.Array, []int{1, 2})
-			cr.compare("slice", us.Slice, []int{3, 4})
-			cr.compare("qs", us.QS, []byte{1, 2, 3})
-			cr.compare("ei", us.EI, 33)
-			if err := cr.finish(); err != nil {
+	t.Run("nil nozero",
+		func(t *testing.T) {
+			var us UNil
+			err := unmarshaler.Unmarshal(&us, queryString)
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "str")
+				cr.compare("b", us.B, true)
+				cr.compare("i", us.I, -1)
+				cr.compare("i8", us.I8, int8(-8))
+				cr.compare("i16", us.I16, int16(-16))
+				cr.compare("i32", us.I32, int32(-32))
+				cr.compare("i64", us.I64, int64(-64))
+				cr.compare("u", us.U, uint(1))
+				cr.compare("u8", us.U8, uint8(8))
+				cr.compare("u16", us.U16, uint16(16))
+				cr.compare("u32", us.U32, uint32(32))
+				cr.compare("u64", us.U64, uint64(64))
+				cr.compare("f32", us.F32, float32(32.32))
+				cr.compare("f64", us.F64, 64.64)
+				cr.compare("ptr", us.Ptr, 42)
+				cr.compare("array", us.Array, []int{1, 2})
+				cr.compare("slice", us.Slice, []int{3, 4})
+				cr.compare("qs", us.QS, []byte{1, 2, 3})
+				cr.compare("ei", us.EI, 33)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: nil, struct presence: nil, queryString: zero
-	{
-		var us UNil
-		err := unmarshaler.Unmarshal(&us, "")
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "")
-			cr.compare("b", us.B, false)
-			cr.compare("i", us.I, 0)
-			cr.compare("i8", us.I8, int8(0))
-			cr.compare("i16", us.I16, int16(0))
-			cr.compare("i32", us.I32, int32(0))
-			cr.compare("i64", us.I64, int64(0))
-			cr.compare("u", us.U, uint(0))
-			cr.compare("u8", us.U8, uint8(0))
-			cr.compare("u16", us.U16, uint16(0))
-			cr.compare("u32", us.U32, uint32(0))
-			cr.compare("u64", us.U64, uint64(0))
-			cr.compare("f32", us.F32, float32(0.0))
-			cr.compare("f64", us.F64, 0.0)
-			cr.compare("ptr", us.Ptr, nil)
-			cr.compare("array", us.Array, []int{0, 0})
-			cr.compare("slice", us.Slice, nil)
-			cr.compare("qs", us.QS, nil)
-			cr.compare("ei", us.EI, 0)
-			if err := cr.finish(); err != nil {
+	t.Run("nil zero",
+		func(t *testing.T) {
+			var us UNil
+			err := unmarshaler.Unmarshal(&us, "")
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "")
+				cr.compare("b", us.B, false)
+				cr.compare("i", us.I, 0)
+				cr.compare("i8", us.I8, int8(0))
+				cr.compare("i16", us.I16, int16(0))
+				cr.compare("i32", us.I32, int32(0))
+				cr.compare("i64", us.I64, int64(0))
+				cr.compare("u", us.U, uint(0))
+				cr.compare("u8", us.U8, uint8(0))
+				cr.compare("u16", us.U16, uint16(0))
+				cr.compare("u32", us.U32, uint32(0))
+				cr.compare("u64", us.U64, uint64(0))
+				cr.compare("f32", us.F32, float32(0.0))
+				cr.compare("f64", us.F64, 0.0)
+				cr.compare("ptr", us.Ptr, nil)
+				cr.compare("array", us.Array, []int{0, 0})
+				cr.compare("slice", us.Slice, nil)
+				cr.compare("qs", us.QS, nil)
+				cr.compare("ei", us.EI, 0)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: nil, struct presence: req, queryString: nozero
-	{
-		var us UReq
-		err := unmarshaler.Unmarshal(&us, queryString)
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "str")
-			cr.compare("b", us.B, true)
-			cr.compare("i", us.I, -1)
-			cr.compare("i8", us.I8, int8(-8))
-			cr.compare("i16", us.I16, int16(-16))
-			cr.compare("i32", us.I32, int32(-32))
-			cr.compare("i64", us.I64, int64(-64))
-			cr.compare("u", us.U, uint(1))
-			cr.compare("u8", us.U8, uint8(8))
-			cr.compare("u16", us.U16, uint16(16))
-			cr.compare("u32", us.U32, uint32(32))
-			cr.compare("u64", us.U64, uint64(64))
-			cr.compare("f32", us.F32, float32(32.32))
-			cr.compare("f64", us.F64, 64.64)
-			cr.compare("ptr", us.Ptr, 42)
-			cr.compare("array", us.Array, []int{1, 2})
-			cr.compare("slice", us.Slice, []int{3, 4})
-			cr.compare("qs", us.QS, []byte{1, 2, 3})
-			cr.compare("ei", us.EI, 33)
-			if err := cr.finish(); err != nil {
+	t.Run("req nozero",
+		func(t *testing.T) {
+			var us UReq
+			err := unmarshaler.Unmarshal(&us, queryString)
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "str")
+				cr.compare("b", us.B, true)
+				cr.compare("i", us.I, -1)
+				cr.compare("i8", us.I8, int8(-8))
+				cr.compare("i16", us.I16, int16(-16))
+				cr.compare("i32", us.I32, int32(-32))
+				cr.compare("i64", us.I64, int64(-64))
+				cr.compare("u", us.U, uint(1))
+				cr.compare("u8", us.U8, uint8(8))
+				cr.compare("u16", us.U16, uint16(16))
+				cr.compare("u32", us.U32, uint32(32))
+				cr.compare("u64", us.U64, uint64(64))
+				cr.compare("f32", us.F32, float32(32.32))
+				cr.compare("f64", us.F64, 64.64)
+				cr.compare("ptr", us.Ptr, 42)
+				cr.compare("array", us.Array, []int{1, 2})
+				cr.compare("slice", us.Slice, []int{3, 4})
+				cr.compare("qs", us.QS, []byte{1, 2, 3})
+				cr.compare("ei", us.EI, 33)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: nil, struct presence: req, queryString: zero
-	{
-		var us UReq
-		err := unmarshaler.Unmarshal(&us, "")
-		if err == nil {
-			t.Error("unexpected success")
-		} else if _, ok := IsRequiredFieldError(err); !ok {
-			t.Errorf("expected a RequiredFieldError :: %v", err)
-		}
-	}
+	t.Run("req zero",
+		func(t *testing.T) {
+			var us UReq
+			err := unmarshaler.Unmarshal(&us, "")
+			if err == nil {
+				t.Error("unexpected success")
+			} else if _, ok := IsRequiredFieldError(err); !ok {
+				t.Errorf("expected a RequiredFieldError :: %v", err)
+			}
+		},
+	)
 }
 
 func TestDefaultReq(t *testing.T) {
@@ -880,50 +912,55 @@ func TestDefaultReq(t *testing.T) {
 	unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
 
 	// default presence: req, struct presence: unspecified, queryString: nozero
-	{
-		var us UUnspecified
-		err := unmarshaler.Unmarshal(&us, queryString)
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "str")
-			cr.compare("b", us.B, true)
-			cr.compare("i", us.I, -1)
-			cr.compare("i8", us.I8, int8(-8))
-			cr.compare("i16", us.I16, int16(-16))
-			cr.compare("i32", us.I32, int32(-32))
-			cr.compare("i64", us.I64, int64(-64))
-			cr.compare("u", us.U, uint(1))
-			cr.compare("u8", us.U8, uint8(8))
-			cr.compare("u16", us.U16, uint16(16))
-			cr.compare("u32", us.U32, uint32(32))
-			cr.compare("u64", us.U64, uint64(64))
-			cr.compare("f32", us.F32, float32(32.32))
-			cr.compare("f64", us.F64, 64.64)
-			cr.compare("ptr", us.Ptr, 42)
-			cr.compare("array", us.Array, []int{1, 2})
-			cr.compare("slice", us.Slice, []int{3, 4})
-			cr.compare("qs", us.QS, []byte{1, 2, 3})
-			cr.compare("ei", us.EI, 33)
-			if err := cr.finish(); err != nil {
+	t.Run("",
+		func(t *testing.T) {
+			var us UUnspecified
+			err := unmarshaler.Unmarshal(&us, queryString)
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "str")
+				cr.compare("b", us.B, true)
+				cr.compare("i", us.I, -1)
+				cr.compare("i8", us.I8, int8(-8))
+				cr.compare("i16", us.I16, int16(-16))
+				cr.compare("i32", us.I32, int32(-32))
+				cr.compare("i64", us.I64, int64(-64))
+				cr.compare("u", us.U, uint(1))
+				cr.compare("u8", us.U8, uint8(8))
+				cr.compare("u16", us.U16, uint16(16))
+				cr.compare("u32", us.U32, uint32(32))
+				cr.compare("u64", us.U64, uint64(64))
+				cr.compare("f32", us.F32, float32(32.32))
+				cr.compare("f64", us.F64, 64.64)
+				cr.compare("ptr", us.Ptr, 42)
+				cr.compare("array", us.Array, []int{1, 2})
+				cr.compare("slice", us.Slice, []int{3, 4})
+				cr.compare("qs", us.QS, []byte{1, 2, 3})
+				cr.compare("ei", us.EI, 33)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: req, struct presence: unspecified, queryString: zero
-	{
-		var us UUnspecified
-		err := unmarshaler.Unmarshal(&us, "")
-		if err == nil {
-			t.Error("unexpected success")
-		} else if _, ok := IsRequiredFieldError(err); !ok {
-			t.Errorf("expected a RequiredFieldError :: %v", err)
-		}
-	}
+	t.Run("",
+		func(t *testing.T) {
+			var us UUnspecified
+			err := unmarshaler.Unmarshal(&us, "")
+			if err == nil {
+				t.Error("unexpected success")
+			} else if _, ok := IsRequiredFieldError(err); !ok {
+				t.Errorf("expected a RequiredFieldError :: %v", err)
+			}
+		},
+	)
 
 	// default presence: req, struct presence: opt, queryString: nozero
+
 	{
 		var us UOpt
 		err := unmarshaler.Unmarshal(&us, queryString)
@@ -1060,74 +1097,210 @@ func TestUnmarshalMap(t *testing.T) {
 	// Req should be ingored and shouldn't be a problem in case of map unmarshaling.
 	unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
 
-	{
-		// m is nil, Unmarshal will have to create a new map
-		var m map[string]UQSBytes
-		err := unmarshaler.Unmarshal(&m, "a=000102&b=030405")
-		if err != nil {
-			t.Error(err)
-		} else if len(m) != 2 {
-			t.Errorf("map should have 2 keys - 'a' and 'b': %v", m)
-		} else {
-			want := UQSBytes{0, 1, 2}
-			if a, ok := m["a"]; !ok {
-				t.Errorf("'a' is missing: %v", m)
-			} else if !compareValues(a, want) {
-				t.Errorf("a == %#v, want %#v", a, want)
+	t.Run("nil",
+		func(t *testing.T) {
+			// m is nil, Unmarshal will have to create a new map
+			var m map[string]UQSBytes
+			err := unmarshaler.Unmarshal(&m, "a=000102&b=030405")
+			if err != nil {
+				t.Error(err)
+			} else if len(m) != 2 {
+				t.Errorf("map should have 2 keys - 'a' and 'b': %v", m)
+			} else {
+				want := UQSBytes{0, 1, 2}
+				if a, ok := m["a"]; !ok {
+					t.Errorf("'a' is missing: %v", m)
+				} else if !compareValues(a, want) {
+					t.Errorf("a == %#v, want %#v", a, want)
+				}
+
+				want = UQSBytes{3, 4, 5}
+				if b, ok := m["b"]; !ok {
+					t.Errorf("'b' is missing: %v", m)
+				} else if !compareValues(b, want) {
+					t.Errorf("b == %#v, want %#v", b, want)
+				}
+			}
+		},
+	)
+
+	t.Run("not nil",
+		func(t *testing.T) {
+			// m isn't nil, Unmarshal shouldn't create the map and it should
+			// overwrite "a" but should leave "x" untouched.
+			m := map[string]UQSBytes{
+				"a": {9},
+				"x": {9},
+			}
+			// here the query string contains an extra "&c="
+			err := unmarshaler.Unmarshal(&m, "a=000102&b=030405&c=")
+			if err != nil {
+				t.Error(err)
+			} else if len(m) != 4 {
+				t.Errorf("map should have 2 keys - 'a', 'b' and 'c': %v", m)
+			} else {
+				want := UQSBytes{0, 1, 2}
+				if a, ok := m["a"]; !ok {
+					t.Errorf("'a' is missing: %v", m)
+				} else if !compareValues(a, want) {
+					t.Errorf("a == %#v, want %#v", a, want)
+				}
+
+				want = UQSBytes{3, 4, 5}
+				if b, ok := m["b"]; !ok {
+					t.Errorf("'b' is missing: %v", m)
+				} else if !compareValues(b, want) {
+					t.Errorf("b == %#v, want %#v", b, want)
+				}
+
+				want = UQSBytes{}
+				if c, ok := m["c"]; !ok {
+					t.Errorf("'c' is missing: %v", m)
+				} else if !compareValues(c, want) {
+					t.Errorf("c == %#v, want %#v", c, want)
+				}
+
+				want = UQSBytes{9}
+				if x, ok := m["x"]; !ok {
+					t.Errorf("'x' is missing: %v", x)
+				} else if !compareValues(x, want) {
+					t.Errorf("x == %#v, want %#v", x, want)
+				}
+			}
+		},
+	)
+}
+
+func TestUnmarshalSlice(t *testing.T) {
+	// Req should be ingored and shouldn't be a problem in case of map unmarshaling.
+
+	t.Run("empty base",
+		func(t *testing.T) {
+			// s is nil, Unmarshal will have to create a new map
+			s := struct {
+				A []int `qs:"a"`
+			}{}
+			unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
+			err := unmarshaler.Unmarshal(&s, "a=1&a=2&a=3&a=4")
+			if err != nil {
+				t.Error(err)
+			} else if len(s.A) != 4 {
+				t.Errorf("slice should have 4 values from 1 to 4: %v", s)
+			} else {
+				want := []int{1, 2, 3, 4}
+				if !compareValues(s.A, want) {
+					t.Errorf("got '%#v', but want '%#v'", s, want)
+				}
+			}
+		},
+	)
+
+	t.Run("not empty base keep old",
+		func(t *testing.T) {
+			// s is nil, Unmarshal will have to create a new map
+			s := struct {
+				A []int `qs:"a"`
+			}{
+				A: []int{0, 10},
+			}
+			unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
+			err := unmarshaler.Unmarshal(&s, "a=1&a=2&a=3&a=4")
+			if err != nil {
+				t.Error(err)
+			} else if len(s.A) != 6 {
+				t.Errorf("slice should have 6 values 0, 10 and next seq from 1 to 4: %v", s)
+			} else {
+				want := []int{0, 10, 1, 2, 3, 4}
+				if !compareValues(s.A, want) {
+					t.Errorf("got '%#v', but want '%#v'", s, want)
+				}
+			}
+		},
+	)
+
+	t.Run("not empty base clear old",
+		func(t *testing.T) {
+			// s is nil, Unmarshal will have to create a new map
+			s := struct {
+				A []int `qs:"a"`
+			}{
+				A: []int{0, 10},
+			}
+			unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
+			err := unmarshaler.Unmarshal(&s, "a=1&a=2&a=3&a=4")
+			if err != nil {
+				t.Error(err)
+			} else if len(s.A) != 4 {
+				t.Errorf("slice should have 5 values from 1 to 4: %v", s)
+			} else {
+				want := []int{1, 2, 3, 4}
+				if !compareValues(s.A, want) {
+					t.Errorf("got '%#v', but want '%#v'", s, want)
+				}
+			}
+		},
+	)
+
+	t.Run("unexpected valus with error",
+		func(t *testing.T) {
+			// s is nil, Unmarshal will have to create a new map
+			s := struct {
+				A []int `qs:"a"`
+			}{}
+			unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
+			err := unmarshaler.Unmarshal(&s, "a=1&a=2&a=help&a=4")
+			if err == nil {
+				t.Error("unexpected success")
 			}
 
-			want = UQSBytes{3, 4, 5}
-			if b, ok := m["b"]; !ok {
-				t.Errorf("'b' is missing: %v", m)
-			} else if !compareValues(b, want) {
-				t.Errorf("b == %#v, want %#v", b, want)
+			want := errors.New("error unmarshaling url.Values entry \"a\" :: error unmarshaling slice index 2 :: strconv.ParseInt: parsing \"help\": invalid syntax")
+			if !compareValues(err.Error(), want.Error()) {
+				t.Errorf("got '%#v', but want '%#v'", err, want)
 			}
-		}
-	}
+		},
+	)
 
-	{
-		// m isn't nil, Unmarshal shouldn't create the map and it should
-		// overwrite "a" but should leave "x" untouched.
-		m := map[string]UQSBytes{
-			"a": {9},
-			"x": {9},
-		}
-		// here the query string contains an extra "&c="
-		err := unmarshaler.Unmarshal(&m, "a=000102&b=030405&c=")
-		if err != nil {
-			t.Error(err)
-		} else if len(m) != 4 {
-			t.Errorf("map should have 2 keys - 'a', 'b' and 'c': %v", m)
-		} else {
-			want := UQSBytes{0, 1, 2}
-			if a, ok := m["a"]; !ok {
-				t.Errorf("'a' is missing: %v", m)
-			} else if !compareValues(a, want) {
-				t.Errorf("a == %#v, want %#v", a, want)
+	t.Run("unexpected valus without error",
+		func(t *testing.T) {
+			// s is nil, Unmarshal will have to create a new map
+			s := struct {
+				A []int `qs:"a"`
+			}{}
+			unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
+			err := unmarshaler.Unmarshal(&s, "a=1&a=2&a=help&a=4")
+			if err != nil {
+				t.Error(err)
+			} else if len(s.A) != 3 {
+				t.Errorf("slice should have 3 values from 1 to 4 without 3: %v", s)
+			} else {
+				want := []int{1, 2, 4}
+				if !compareValues(s.A, want) {
+					t.Errorf("got '%#v', but want '%#v'", s, want)
+				}
 			}
+		},
+	)
 
-			want = UQSBytes{3, 4, 5}
-			if b, ok := m["b"]; !ok {
-				t.Errorf("'b' is missing: %v", m)
-			} else if !compareValues(b, want) {
-				t.Errorf("b == %#v, want %#v", b, want)
+	t.Run("empty comma",
+		func(t *testing.T) {
+			// s is nil, Unmarshal will have to create a new map
+			s := struct {
+				A []int `qs:"a"`
+			}{}
+			unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
+			err := unmarshaler.Unmarshal(&s, "a=1,2,3,4")
+			if err != nil {
+				t.Error(err)
+			} else if len(s.A) != 4 {
+				t.Errorf("slice should have 4 values from 1 to 4: %v", s)
+			} else {
+				want := []int{1, 2, 3, 4}
+				if !compareValues(s.A, want) {
+					t.Errorf("got '%#v', but want '%#v'", s, want)
+				}
 			}
-
-			want = UQSBytes{}
-			if c, ok := m["c"]; !ok {
-				t.Errorf("'c' is missing: %v", m)
-			} else if !compareValues(c, want) {
-				t.Errorf("c == %#v, want %#v", c, want)
-			}
-
-			want = UQSBytes{9}
-			if x, ok := m["x"]; !ok {
-				t.Errorf("'x' is missing: %v", x)
-			} else if !compareValues(x, want) {
-				t.Errorf("x == %#v, want %#v", x, want)
-			}
-		}
-	}
+		},
+	)
 }
 
 type UIgnoredFields struct {

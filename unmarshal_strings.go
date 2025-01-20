@@ -110,15 +110,45 @@ func (p *sliceUnmarshaler) Unmarshal(v reflect.Value, a []string, opts *Unmarsha
 		return &WrongTypeError{Actual: t, Expected: p.Type}
 	}
 
+	// resize or create slice
+	n := 0
 	if v.IsNil() {
 		v.Set(reflect.MakeSlice(t, len(a), len(a)))
+	} else {
+		keepPrevValues := false
+
+		oldLen := v.Len()
+		newLen := len(a)
+		if keepPrevValues {
+			n = oldLen
+			newLen += oldLen
+		}
+
+		s := reflect.MakeSlice(t, newLen, newLen)
+		if keepPrevValues {
+			for i := 0; i < oldLen; i++ {
+				s.Index(i).Set(v.Index(i))
+			}
+		}
+		v.Set(s)
 	}
 
+	// unmarshal elements of slice
+	var errLoop error
 	for i := range a {
-		err := p.ElemUnmarshaler.Unmarshal(v.Index(i), a[i:i+1], opts)
-		if err != nil {
-			return fmt.Errorf("error unmarshaling slice index %v :: %v", i, err)
+		err := p.ElemUnmarshaler.Unmarshal(v.Index(n), a[i:i+1], opts)
+		if err == nil {
+			n++
+		} else if true {
+			errLoop = fmt.Errorf("error unmarshaling slice index %v :: %v", i, err)
 		}
+	}
+
+	// cut unmarshleable values from slice or clear if error occurred
+	if errLoop == nil {
+		v.Set(v.Slice(0, n))
+	} else {
+		v.Set(v.Slice(0, 0))
 	}
 
 	return nil
