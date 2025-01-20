@@ -5,9 +5,11 @@ import (
 	"reflect"
 )
 
-type PrimitiveUnmarshalerFunc func(v reflect.Value, s string, opts *UnmarshalOptions) error
-type UnmarshalerFunc func(v reflect.Value, a []string, opts *UnmarshalOptions) error
-type UnmarshalerFactoryFunc func(t reflect.Type, opts *UnmarshalOptions) (Unmarshaler, error)
+type (
+	PrimitiveUnmarshalerFunc func(v reflect.Value, s string, opts *UnmarshalOptions) error
+	UnmarshalerFunc          func(v reflect.Value, a []string, opts *UnmarshalOptions) error
+	UnmarshalerFactoryFunc   func(t reflect.Type, opts *UnmarshalOptions) (Unmarshaler, error)
+)
 
 // Unmarshaler can unmarshal a []string (which is the value type of the
 // url.Values map) into a reflect.Value.

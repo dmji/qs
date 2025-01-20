@@ -90,12 +90,10 @@ func (o *fakeUnmarshalerFactory) Unmarshaler(t reflect.Type, opts *UnmarshalOpti
 
 func (p *fakeUnmarshalerFactory) RegisterSubFactory(k reflect.Kind, fn UnmarshalerFactoryFunc) error {
 	panic("!mock not implemented!")
-
 }
 
 func (p *fakeUnmarshalerFactory) RegisterCustomType(k reflect.Type, fn PrimitiveUnmarshalerFunc) error {
 	panic("!mock not implemented!")
-
 }
 
 func (p *fakeUnmarshalerFactory) RegisterKindOverride(k reflect.Kind, fn PrimitiveUnmarshalerFunc) error {
