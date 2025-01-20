@@ -27,7 +27,7 @@ type embeddedFieldUnmarshaler struct {
 type fieldUnmarshaler struct {
 	FieldIndex  int
 	Unmarshaler Unmarshaler
-	Tag         *parsedTag
+	Tag         *ParsedTagInfo
 }
 
 // newStructUnmarshaler creates a struct unmarshaler for a specific struct type.

@@ -27,7 +27,7 @@ type embeddedFieldMarshaler struct {
 type fieldMarshaler struct {
 	FieldIndex int
 	Marshaler  Marshaler
-	Tag        *parsedTag
+	Tag        *ParsedTagInfo
 }
 
 // newStructMarshaler creates a struct marshaler for a specific struct type.

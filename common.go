@@ -18,8 +18,10 @@ const tagKey = "qs"
 // names of the struct.
 // NameTransformFunc is the type of the DefaultNameTransform,
 // MarshalOptions.NameTransformer and UnmarshalOptions.NameTransformer variables.
-type NameTransformFunc func(string) string
-type SliceToStringFunc func([]string) (string, error)
+type (
+	NameTransformFunc func(string) string
+	SliceToStringFunc func([]string) (string, error)
+)
 
 var (
 	stringType = reflect.TypeOf("")
@@ -27,13 +29,13 @@ var (
 	urlType    = reflect.TypeOf(url.URL{})
 )
 
-type parsedTag struct {
+type ParsedTagInfo struct {
 	Name              string
 	MarshalPresence   MarshalPresence
 	UnmarshalPresence UnmarshalPresence
 }
 
-func getStructFieldInfo(field reflect.StructField, nt NameTransformFunc, defaultMarshalPresence MarshalPresence, defaultUnmarshalPresence UnmarshalPresence) (*parsedTag, error) {
+func getStructFieldInfo(field reflect.StructField, nt NameTransformFunc, defaultMarshalPresence MarshalPresence, defaultUnmarshalPresence UnmarshalPresence) (*ParsedTagInfo, error) {
 	// Skipping unexported fields.
 	if field.PkgPath != "" && !field.Anonymous {
 		return nil, nil
@@ -57,10 +59,10 @@ func getStructFieldInfo(field reflect.StructField, nt NameTransformFunc, default
 	return tag, nil
 }
 
-func parseFieldTag(tagStr reflect.StructTag, defaultMarshalPresence MarshalPresence, defaultUnmarshalPresence UnmarshalPresence) (*parsedTag, error) {
+func parseFieldTag(tagStr reflect.StructTag, defaultMarshalPresence MarshalPresence, defaultUnmarshalPresence UnmarshalPresence) (*ParsedTagInfo, error) {
 	v := tagStr.Get(tagKey)
 	nameAndOptions := strings.Split(v, ",")
-	tag := &parsedTag{
+	tag := &ParsedTagInfo{
 		Name:              nameAndOptions[0],
 		MarshalPresence:   MarshalPresenceMPUnspecified,
 		UnmarshalPresence: UnmarshalPresenceUPUnspecified,
@@ -72,7 +74,6 @@ func parseFieldTag(tagStr reflect.StructTag, defaultMarshalPresence MarshalPrese
 	}
 
 	for _, option := range options {
-
 		bErr := true
 		eU, err := UnmarshalPresenceFromString(option)
 		if err == nil {
