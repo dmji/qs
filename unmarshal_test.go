@@ -961,136 +961,148 @@ func TestDefaultReq(t *testing.T) {
 
 	// default presence: req, struct presence: opt, queryString: nozero
 
-	{
-		var us UOpt
-		err := unmarshaler.Unmarshal(&us, queryString)
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "str")
-			cr.compare("b", us.B, true)
-			cr.compare("i", us.I, -1)
-			cr.compare("i8", us.I8, int8(-8))
-			cr.compare("i16", us.I16, int16(-16))
-			cr.compare("i32", us.I32, int32(-32))
-			cr.compare("i64", us.I64, int64(-64))
-			cr.compare("u", us.U, uint(1))
-			cr.compare("u8", us.U8, uint8(8))
-			cr.compare("u16", us.U16, uint16(16))
-			cr.compare("u32", us.U32, uint32(32))
-			cr.compare("u64", us.U64, uint64(64))
-			cr.compare("f32", us.F32, float32(32.32))
-			cr.compare("f64", us.F64, 64.64)
-			cr.compare("ptr", us.Ptr, 42)
-			cr.compare("array", us.Array, []int{1, 2})
-			cr.compare("slice", us.Slice, []int{3, 4})
-			cr.compare("qs", us.QS, []byte{1, 2, 3})
-			cr.compare("ei", us.EI, 33)
-			if err := cr.finish(); err != nil {
+	t.Run("",
+		func(t *testing.T) {
+			var us UOpt
+			err := unmarshaler.Unmarshal(&us, queryString)
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "str")
+				cr.compare("b", us.B, true)
+				cr.compare("i", us.I, -1)
+				cr.compare("i8", us.I8, int8(-8))
+				cr.compare("i16", us.I16, int16(-16))
+				cr.compare("i32", us.I32, int32(-32))
+				cr.compare("i64", us.I64, int64(-64))
+				cr.compare("u", us.U, uint(1))
+				cr.compare("u8", us.U8, uint8(8))
+				cr.compare("u16", us.U16, uint16(16))
+				cr.compare("u32", us.U32, uint32(32))
+				cr.compare("u64", us.U64, uint64(64))
+				cr.compare("f32", us.F32, float32(32.32))
+				cr.compare("f64", us.F64, 64.64)
+				cr.compare("ptr", us.Ptr, 42)
+				cr.compare("array", us.Array, []int{1, 2})
+				cr.compare("slice", us.Slice, []int{3, 4})
+				cr.compare("qs", us.QS, []byte{1, 2, 3})
+				cr.compare("ei", us.EI, 33)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: req, struct presence: opt, queryString: zero
-	{
-		var us UOpt
-		err := unmarshaler.Unmarshal(&us, "")
-		if err == nil {
-			t.Error("unexpected success")
-		} else if _, ok := IsRequiredFieldError(err); !ok {
-			t.Errorf("expected a RequiredFieldError :: %v", err)
-		}
-	}
+	t.Run("",
+		func(t *testing.T) {
+			var us UOpt
+			err := unmarshaler.Unmarshal(&us, "")
+			if err == nil {
+				t.Error("unexpected success")
+			} else if _, ok := IsRequiredFieldError(err); !ok {
+				t.Errorf("expected a RequiredFieldError :: %v", err)
+			}
+		},
+	)
 
 	// default presence: req, struct presence: nil, queryString: nozero
-	{
-		var us UNil
-		err := unmarshaler.Unmarshal(&us, queryString)
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "str")
-			cr.compare("b", us.B, true)
-			cr.compare("i", us.I, -1)
-			cr.compare("i8", us.I8, int8(-8))
-			cr.compare("i16", us.I16, int16(-16))
-			cr.compare("i32", us.I32, int32(-32))
-			cr.compare("i64", us.I64, int64(-64))
-			cr.compare("u", us.U, uint(1))
-			cr.compare("u8", us.U8, uint8(8))
-			cr.compare("u16", us.U16, uint16(16))
-			cr.compare("u32", us.U32, uint32(32))
-			cr.compare("u64", us.U64, uint64(64))
-			cr.compare("f32", us.F32, float32(32.32))
-			cr.compare("f64", us.F64, 64.64)
-			cr.compare("ptr", us.Ptr, 42)
-			cr.compare("array", us.Array, []int{1, 2})
-			cr.compare("slice", us.Slice, []int{3, 4})
-			cr.compare("qs", us.QS, []byte{1, 2, 3})
-			cr.compare("ei", us.EI, 33)
-			if err := cr.finish(); err != nil {
+	t.Run("",
+		func(t *testing.T) {
+			var us UNil
+			err := unmarshaler.Unmarshal(&us, queryString)
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "str")
+				cr.compare("b", us.B, true)
+				cr.compare("i", us.I, -1)
+				cr.compare("i8", us.I8, int8(-8))
+				cr.compare("i16", us.I16, int16(-16))
+				cr.compare("i32", us.I32, int32(-32))
+				cr.compare("i64", us.I64, int64(-64))
+				cr.compare("u", us.U, uint(1))
+				cr.compare("u8", us.U8, uint8(8))
+				cr.compare("u16", us.U16, uint16(16))
+				cr.compare("u32", us.U32, uint32(32))
+				cr.compare("u64", us.U64, uint64(64))
+				cr.compare("f32", us.F32, float32(32.32))
+				cr.compare("f64", us.F64, 64.64)
+				cr.compare("ptr", us.Ptr, 42)
+				cr.compare("array", us.Array, []int{1, 2})
+				cr.compare("slice", us.Slice, []int{3, 4})
+				cr.compare("qs", us.QS, []byte{1, 2, 3})
+				cr.compare("ei", us.EI, 33)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: req, struct presence: nil, queryString: zero
-	{
-		var us UNil
-		err := unmarshaler.Unmarshal(&us, "")
-		if err == nil {
-			t.Error("unexpected success")
-		} else if _, ok := IsRequiredFieldError(err); !ok {
-			t.Errorf("expected a RequiredFieldError :: %v", err)
-		}
-	}
+	t.Run("",
+		func(t *testing.T) {
+			var us UNil
+			err := unmarshaler.Unmarshal(&us, "")
+			if err == nil {
+				t.Error("unexpected success")
+			} else if _, ok := IsRequiredFieldError(err); !ok {
+				t.Errorf("expected a RequiredFieldError :: %v", err)
+			}
+		},
+	)
 
 	// default presence: req, struct presence: req, queryString: nozero
-	{
-		var us UReq
-		err := unmarshaler.Unmarshal(&us, queryString)
-		if err != nil {
-			t.Error(err)
-		} else {
-			var cr comparisonResults
-			cr.compare("s", us.S, "str")
-			cr.compare("b", us.B, true)
-			cr.compare("i", us.I, -1)
-			cr.compare("i8", us.I8, int8(-8))
-			cr.compare("i16", us.I16, int16(-16))
-			cr.compare("i32", us.I32, int32(-32))
-			cr.compare("i64", us.I64, int64(-64))
-			cr.compare("u", us.U, uint(1))
-			cr.compare("u8", us.U8, uint8(8))
-			cr.compare("u16", us.U16, uint16(16))
-			cr.compare("u32", us.U32, uint32(32))
-			cr.compare("u64", us.U64, uint64(64))
-			cr.compare("f32", us.F32, float32(32.32))
-			cr.compare("f64", us.F64, 64.64)
-			cr.compare("ptr", us.Ptr, 42)
-			cr.compare("array", us.Array, []int{1, 2})
-			cr.compare("slice", us.Slice, []int{3, 4})
-			cr.compare("qs", us.QS, []byte{1, 2, 3})
-			cr.compare("ei", us.EI, 33)
-			if err := cr.finish(); err != nil {
+	t.Run("",
+		func(t *testing.T) {
+			var us UReq
+			err := unmarshaler.Unmarshal(&us, queryString)
+			if err != nil {
 				t.Error(err)
+			} else {
+				var cr comparisonResults
+				cr.compare("s", us.S, "str")
+				cr.compare("b", us.B, true)
+				cr.compare("i", us.I, -1)
+				cr.compare("i8", us.I8, int8(-8))
+				cr.compare("i16", us.I16, int16(-16))
+				cr.compare("i32", us.I32, int32(-32))
+				cr.compare("i64", us.I64, int64(-64))
+				cr.compare("u", us.U, uint(1))
+				cr.compare("u8", us.U8, uint8(8))
+				cr.compare("u16", us.U16, uint16(16))
+				cr.compare("u32", us.U32, uint32(32))
+				cr.compare("u64", us.U64, uint64(64))
+				cr.compare("f32", us.F32, float32(32.32))
+				cr.compare("f64", us.F64, 64.64)
+				cr.compare("ptr", us.Ptr, 42)
+				cr.compare("array", us.Array, []int{1, 2})
+				cr.compare("slice", us.Slice, []int{3, 4})
+				cr.compare("qs", us.QS, []byte{1, 2, 3})
+				cr.compare("ei", us.EI, 33)
+				if err := cr.finish(); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: req, struct presence: req, queryString: zero
-	{
-		var us UReq
-		err := unmarshaler.Unmarshal(&us, "")
-		if err == nil {
-			t.Error("unexpected success")
-		} else if _, ok := IsRequiredFieldError(err); !ok {
-			t.Errorf("expected a RequiredFieldError :: %v", err)
-		}
-	}
+	t.Run("",
+		func(t *testing.T) {
+			var us UReq
+			err := unmarshaler.Unmarshal(&us, "")
+			if err == nil {
+				t.Error("unexpected success")
+			} else if _, ok := IsRequiredFieldError(err); !ok {
+				t.Errorf("expected a RequiredFieldError :: %v", err)
+			}
+		},
+	)
 }
 
 func TestUnmarshalMap(t *testing.T) {
@@ -1296,8 +1308,29 @@ func TestUnmarshalSlice(t *testing.T) {
 			s := struct {
 				A []int `qs:"a"`
 			}{}
-			unmarshaler := NewUnmarshaler(&UnmarshalerDefaultOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
+			unmarshaler := NewUnmarshaler(&UnmarshalerDefaultOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq), WithUnmarshalOptionSliceSeparator(OptionSliceSeparatorComma))
 			err := unmarshaler.Unmarshal(&s, "a=1,2,3,4")
+			if err != nil {
+				t.Error(err)
+			} else if len(s.A) != 4 {
+				t.Errorf("slice should have 4 values from 1 to 4: %v", s)
+			} else {
+				want := []int{1, 2, 3, 4}
+				if !compareValues(s.A, want) {
+					t.Errorf("got '%#v', but want '%#v'", s, want)
+				}
+			}
+		},
+	)
+
+	t.Run("empty comma with two instances",
+		func(t *testing.T) {
+			// s is nil, Unmarshal will have to create a new map
+			s := struct {
+				A []int `qs:"a"`
+			}{}
+			unmarshaler := NewUnmarshaler(&UnmarshalerDefaultOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq), WithUnmarshalOptionSliceSeparator(OptionSliceSeparatorComma))
+			err := unmarshaler.Unmarshal(&s, "a=1,2&a=3,4")
 			if err != nil {
 				t.Error(err)
 			} else if len(s.A) != 4 {
@@ -1363,21 +1396,29 @@ func TestCheckUnmarshal(t *testing.T) {
 }
 
 func TestCheckUnmarshalType(t *testing.T) {
-	ptrTypeOK := reflect.TypeOf((*UTypes)(nil))
+	t.Run("",
+		func(t *testing.T) {
+			ptrTypeOK := reflect.TypeOf((*UTypes)(nil))
 
-	if err := CheckUnmarshalType(ptrTypeOK); err != nil {
-		t.Errorf("unexpected error :: %v", err)
-	}
-	if err := CheckUnmarshalType(ptrTypeOK.Elem()); err == nil {
-		t.Error("unexpected success")
-	}
+			if err := CheckUnmarshalType(ptrTypeOK); err != nil {
+				t.Errorf("unexpected error :: %v", err)
+			}
+			if err := CheckUnmarshalType(ptrTypeOK.Elem()); err == nil {
+				t.Error("unexpected success")
+			}
+		},
+	)
 
-	ptrTypeNotOK := reflect.TypeOf((*UNonMarshalable)(nil))
+	t.Run("",
+		func(t *testing.T) {
+			ptrTypeNotOK := reflect.TypeOf((*UNonMarshalable)(nil))
 
-	if err := CheckUnmarshalType(ptrTypeNotOK); err == nil {
-		t.Error("unexpected success")
-	}
-	if err := CheckUnmarshalType(ptrTypeNotOK.Elem()); err == nil {
-		t.Error("unexpected success")
-	}
+			if err := CheckUnmarshalType(ptrTypeNotOK); err == nil {
+				t.Error("unexpected success")
+			}
+			if err := CheckUnmarshalType(ptrTypeNotOK.Elem()); err == nil {
+				t.Error("unexpected success")
+			}
+		},
+	)
 }

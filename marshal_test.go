@@ -279,253 +279,265 @@ func TestMarshalValues(t *testing.T) {
 func TestDefaultKeepEmpty(t *testing.T) {
 	var i int = 42
 	// default presence: keepempty, struct presence: unspecified, fields: nozero
-	{
-		vs, err := MarshalValues(&MUnspecified{
-			S:     "str",
-			B:     true,
-			I:     -1,
-			I8:    -8,
-			I16:   -16,
-			I32:   -32,
-			I64:   -64,
-			U:     1,
-			U8:    8,
-			U16:   16,
-			U32:   32,
-			U64:   64,
-			F32:   32.32,
-			F64:   64.64,
-			Ptr:   &i,
-			Array: [2]int{1, 2},
-			Slice: []int{3, 4},
-			QS:    MQSBytes{1, 2, 3},
-			MEmbedded: MEmbedded{
-				MEmbedded2{
-					EI: 33,
+	t.Run("",
+		func(t *testing.T) {
+			vs, err := MarshalValues(&MUnspecified{
+				S:     "str",
+				B:     true,
+				I:     -1,
+				I8:    -8,
+				I16:   -16,
+				I32:   -32,
+				I64:   -64,
+				U:     1,
+				U8:    8,
+				U16:   16,
+				U32:   32,
+				U64:   64,
+				F32:   32.32,
+				F64:   64.64,
+				Ptr:   &i,
+				Array: [2]int{1, 2},
+				Slice: []int{3, 4},
+				QS:    MQSBytes{1, 2, 3},
+				MEmbedded: MEmbedded{
+					MEmbedded2{
+						EI: 33,
+					},
 				},
-			},
-		})
-		if err != nil {
-			t.Error(err)
-		} else {
-			expected := url.Values{
-				"s":     {"str"},
-				"b":     {"true"},
-				"i":     {"-1"},
-				"i8":    {"-8"},
-				"i16":   {"-16"},
-				"i32":   {"-32"},
-				"i64":   {"-64"},
-				"u":     {"1"},
-				"u8":    {"8"},
-				"u16":   {"16"},
-				"u32":   {"32"},
-				"u64":   {"64"},
-				"f32":   {"32.32"},
-				"f64":   {"64.64"},
-				"ptr":   {"42"},
-				"array": {"1", "2"},
-				"slice": {"3", "4"},
-				"qs":    {"010203"},
-				"ei":    {"33"},
-			}
-			if err := expectValues(vs, expected); err != nil {
+			})
+			if err != nil {
 				t.Error(err)
+			} else {
+				expected := url.Values{
+					"s":     {"str"},
+					"b":     {"true"},
+					"i":     {"-1"},
+					"i8":    {"-8"},
+					"i16":   {"-16"},
+					"i32":   {"-32"},
+					"i64":   {"-64"},
+					"u":     {"1"},
+					"u8":    {"8"},
+					"u16":   {"16"},
+					"u32":   {"32"},
+					"u64":   {"64"},
+					"f32":   {"32.32"},
+					"f64":   {"64.64"},
+					"ptr":   {"42"},
+					"array": {"1", "2"},
+					"slice": {"3", "4"},
+					"qs":    {"010203"},
+					"ei":    {"33"},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: keepempty, struct presence: unspecified, fields: zero
-	{
-		vs, err := MarshalValues(&MUnspecified{})
-		if err != nil {
-			t.Error(err)
-		} else {
-			expected := url.Values{
-				"s":     {""},
-				"b":     {"false"},
-				"i":     {"0"},
-				"i8":    {"0"},
-				"i16":   {"0"},
-				"i32":   {"0"},
-				"i64":   {"0"},
-				"u":     {"0"},
-				"u8":    {"0"},
-				"u16":   {"0"},
-				"u32":   {"0"},
-				"u64":   {"0"},
-				"f32":   {"0"},
-				"f64":   {"0"},
-				"array": {"0", "0"},
-				"qs":    {""},
-				"ei":    {"0"},
-			}
-			if err := expectValues(vs, expected); err != nil {
+	t.Run("",
+		func(t *testing.T) {
+			vs, err := MarshalValues(&MUnspecified{})
+			if err != nil {
 				t.Error(err)
+			} else {
+				expected := url.Values{
+					"s":     {""},
+					"b":     {"false"},
+					"i":     {"0"},
+					"i8":    {"0"},
+					"i16":   {"0"},
+					"i32":   {"0"},
+					"i64":   {"0"},
+					"u":     {"0"},
+					"u8":    {"0"},
+					"u16":   {"0"},
+					"u32":   {"0"},
+					"u64":   {"0"},
+					"f32":   {"0"},
+					"f64":   {"0"},
+					"array": {"0", "0"},
+					"qs":    {""},
+					"ei":    {"0"},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: keepempty, struct presence: keepempty, fields: nozero
-	{
-		vs, err := MarshalValues(&MKeepEmpty{
-			S:     "str",
-			B:     true,
-			I:     -1,
-			I8:    -8,
-			I16:   -16,
-			I32:   -32,
-			I64:   -64,
-			U:     1,
-			U8:    8,
-			U16:   16,
-			U32:   32,
-			U64:   64,
-			F32:   32.32,
-			F64:   64.64,
-			Ptr:   &i,
-			Array: [2]int{1, 2},
-			Slice: []int{3, 4},
-			QS:    MQSBytes{1, 2, 3},
-			MEmbedded: MEmbedded{
-				MEmbedded2{
-					EI: 33,
+	t.Run("",
+		func(t *testing.T) {
+			vs, err := MarshalValues(&MKeepEmpty{
+				S:     "str",
+				B:     true,
+				I:     -1,
+				I8:    -8,
+				I16:   -16,
+				I32:   -32,
+				I64:   -64,
+				U:     1,
+				U8:    8,
+				U16:   16,
+				U32:   32,
+				U64:   64,
+				F32:   32.32,
+				F64:   64.64,
+				Ptr:   &i,
+				Array: [2]int{1, 2},
+				Slice: []int{3, 4},
+				QS:    MQSBytes{1, 2, 3},
+				MEmbedded: MEmbedded{
+					MEmbedded2{
+						EI: 33,
+					},
 				},
-			},
-		})
-		if err != nil {
-			t.Error(err)
-		} else {
-			expected := url.Values{
-				"s":     {"str"},
-				"b":     {"true"},
-				"i":     {"-1"},
-				"i8":    {"-8"},
-				"i16":   {"-16"},
-				"i32":   {"-32"},
-				"i64":   {"-64"},
-				"u":     {"1"},
-				"u8":    {"8"},
-				"u16":   {"16"},
-				"u32":   {"32"},
-				"u64":   {"64"},
-				"f32":   {"32.32"},
-				"f64":   {"64.64"},
-				"ptr":   {"42"},
-				"array": {"1", "2"},
-				"slice": {"3", "4"},
-				"qs":    {"010203"},
-				"ei":    {"33"},
-			}
-			if err := expectValues(vs, expected); err != nil {
+			})
+			if err != nil {
 				t.Error(err)
+			} else {
+				expected := url.Values{
+					"s":     {"str"},
+					"b":     {"true"},
+					"i":     {"-1"},
+					"i8":    {"-8"},
+					"i16":   {"-16"},
+					"i32":   {"-32"},
+					"i64":   {"-64"},
+					"u":     {"1"},
+					"u8":    {"8"},
+					"u16":   {"16"},
+					"u32":   {"32"},
+					"u64":   {"64"},
+					"f32":   {"32.32"},
+					"f64":   {"64.64"},
+					"ptr":   {"42"},
+					"array": {"1", "2"},
+					"slice": {"3", "4"},
+					"qs":    {"010203"},
+					"ei":    {"33"},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: keepempty, struct presence: keepempty, fields: zero
-	{
-		vs, err := MarshalValues(&MKeepEmpty{})
-		if err != nil {
-			t.Error(err)
-		} else {
-			expected := url.Values{
-				"s":     {""},
-				"b":     {"false"},
-				"i":     {"0"},
-				"i8":    {"0"},
-				"i16":   {"0"},
-				"i32":   {"0"},
-				"i64":   {"0"},
-				"u":     {"0"},
-				"u8":    {"0"},
-				"u16":   {"0"},
-				"u32":   {"0"},
-				"u64":   {"0"},
-				"f32":   {"0"},
-				"f64":   {"0"},
-				"array": {"0", "0"},
-				"qs":    {""},
-				"ei":    {"0"},
-			}
-			if err := expectValues(vs, expected); err != nil {
+	t.Run("",
+		func(t *testing.T) {
+			vs, err := MarshalValues(&MKeepEmpty{})
+			if err != nil {
 				t.Error(err)
+			} else {
+				expected := url.Values{
+					"s":     {""},
+					"b":     {"false"},
+					"i":     {"0"},
+					"i8":    {"0"},
+					"i16":   {"0"},
+					"i32":   {"0"},
+					"i64":   {"0"},
+					"u":     {"0"},
+					"u8":    {"0"},
+					"u16":   {"0"},
+					"u32":   {"0"},
+					"u64":   {"0"},
+					"f32":   {"0"},
+					"f64":   {"0"},
+					"array": {"0", "0"},
+					"qs":    {""},
+					"ei":    {"0"},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: keepempty, struct presence: omitempty, fields: nozero
-	{
-		vs, err := MarshalValues(&MOmitEmpty{
-			S:     "str",
-			B:     true,
-			I:     -1,
-			I8:    -8,
-			I16:   -16,
-			I32:   -32,
-			I64:   -64,
-			U:     1,
-			U8:    8,
-			U16:   16,
-			U32:   32,
-			U64:   64,
-			F32:   32.32,
-			F64:   64.64,
-			Ptr:   &i,
-			Array: [2]int{1, 2},
-			Slice: []int{3, 4},
-			QS:    MQSBytes{1, 2, 3},
-			MEmbedded: MEmbedded{
-				MEmbedded2{
-					EI: 33,
+	t.Run("",
+		func(t *testing.T) {
+			vs, err := MarshalValues(&MOmitEmpty{
+				S:     "str",
+				B:     true,
+				I:     -1,
+				I8:    -8,
+				I16:   -16,
+				I32:   -32,
+				I64:   -64,
+				U:     1,
+				U8:    8,
+				U16:   16,
+				U32:   32,
+				U64:   64,
+				F32:   32.32,
+				F64:   64.64,
+				Ptr:   &i,
+				Array: [2]int{1, 2},
+				Slice: []int{3, 4},
+				QS:    MQSBytes{1, 2, 3},
+				MEmbedded: MEmbedded{
+					MEmbedded2{
+						EI: 33,
+					},
 				},
-			},
-		})
-		if err != nil {
-			t.Error(err)
-		} else {
-			expected := url.Values{
-				"s":     {"str"},
-				"b":     {"true"},
-				"i":     {"-1"},
-				"i8":    {"-8"},
-				"i16":   {"-16"},
-				"i32":   {"-32"},
-				"i64":   {"-64"},
-				"u":     {"1"},
-				"u8":    {"8"},
-				"u16":   {"16"},
-				"u32":   {"32"},
-				"u64":   {"64"},
-				"f32":   {"32.32"},
-				"f64":   {"64.64"},
-				"ptr":   {"42"},
-				"array": {"1", "2"},
-				"slice": {"3", "4"},
-				"qs":    {"010203"},
-				"ei":    {"33"},
-			}
-			if err := expectValues(vs, expected); err != nil {
+			})
+			if err != nil {
 				t.Error(err)
+			} else {
+				expected := url.Values{
+					"s":     {"str"},
+					"b":     {"true"},
+					"i":     {"-1"},
+					"i8":    {"-8"},
+					"i16":   {"-16"},
+					"i32":   {"-32"},
+					"i64":   {"-64"},
+					"u":     {"1"},
+					"u8":    {"8"},
+					"u16":   {"16"},
+					"u32":   {"32"},
+					"u64":   {"64"},
+					"f32":   {"32.32"},
+					"f64":   {"64.64"},
+					"ptr":   {"42"},
+					"array": {"1", "2"},
+					"slice": {"3", "4"},
+					"qs":    {"010203"},
+					"ei":    {"33"},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: keepempty, struct presence: omitempty, fields: zero
-	{
-		vs, err := MarshalValues(&MOmitEmpty{})
-		if err != nil {
-			t.Error(err)
-		} else {
-			expected := url.Values{
-				"array": {"0", "0"},
-				"ei":    {"0"},
-			}
-			if err := expectValues(vs, expected); err != nil {
+	t.Run("",
+		func(t *testing.T) {
+			vs, err := MarshalValues(&MOmitEmpty{})
+			if err != nil {
 				t.Error(err)
+			} else {
+				expected := url.Values{
+					"array": {"0", "0"},
+					"ei":    {"0"},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 }
 
 func TestDefaultOmitEmpty(t *testing.T) {
@@ -533,235 +545,247 @@ func TestDefaultOmitEmpty(t *testing.T) {
 
 	var i int = 42
 	// default presence: omitempty, struct presence: unspecified, fields: nozero
-	{
-		vs, err := marshaler.MarshalValues(&MUnspecified{
-			S:     "str",
-			B:     true,
-			I:     -1,
-			I8:    -8,
-			I16:   -16,
-			I32:   -32,
-			I64:   -64,
-			U:     1,
-			U8:    8,
-			U16:   16,
-			U32:   32,
-			U64:   64,
-			F32:   32.32,
-			F64:   64.64,
-			Ptr:   &i,
-			Array: [2]int{1, 2},
-			Slice: []int{3, 4},
-			QS:    MQSBytes{1, 2, 3},
-			MEmbedded: MEmbedded{
-				MEmbedded2{
-					EI: 33,
+	t.Run("",
+		func(t *testing.T) {
+			vs, err := marshaler.MarshalValues(&MUnspecified{
+				S:     "str",
+				B:     true,
+				I:     -1,
+				I8:    -8,
+				I16:   -16,
+				I32:   -32,
+				I64:   -64,
+				U:     1,
+				U8:    8,
+				U16:   16,
+				U32:   32,
+				U64:   64,
+				F32:   32.32,
+				F64:   64.64,
+				Ptr:   &i,
+				Array: [2]int{1, 2},
+				Slice: []int{3, 4},
+				QS:    MQSBytes{1, 2, 3},
+				MEmbedded: MEmbedded{
+					MEmbedded2{
+						EI: 33,
+					},
 				},
-			},
-		})
-		if err != nil {
-			t.Error(err)
-		} else {
-			expected := url.Values{
-				"s":     {"str"},
-				"b":     {"true"},
-				"i":     {"-1"},
-				"i8":    {"-8"},
-				"i16":   {"-16"},
-				"i32":   {"-32"},
-				"i64":   {"-64"},
-				"u":     {"1"},
-				"u8":    {"8"},
-				"u16":   {"16"},
-				"u32":   {"32"},
-				"u64":   {"64"},
-				"f32":   {"32.32"},
-				"f64":   {"64.64"},
-				"ptr":   {"42"},
-				"array": {"1", "2"},
-				"slice": {"3", "4"},
-				"qs":    {"010203"},
-				"ei":    {"33"},
-			}
-			if err := expectValues(vs, expected); err != nil {
+			})
+			if err != nil {
 				t.Error(err)
+			} else {
+				expected := url.Values{
+					"s":     {"str"},
+					"b":     {"true"},
+					"i":     {"-1"},
+					"i8":    {"-8"},
+					"i16":   {"-16"},
+					"i32":   {"-32"},
+					"i64":   {"-64"},
+					"u":     {"1"},
+					"u8":    {"8"},
+					"u16":   {"16"},
+					"u32":   {"32"},
+					"u64":   {"64"},
+					"f32":   {"32.32"},
+					"f64":   {"64.64"},
+					"ptr":   {"42"},
+					"array": {"1", "2"},
+					"slice": {"3", "4"},
+					"qs":    {"010203"},
+					"ei":    {"33"},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: omitempty, struct presence: unspecified, fields: zero
-	{
-		vs, err := marshaler.MarshalValues(&MUnspecified{})
-		if err != nil {
-			t.Error(err)
-		} else {
-			expected := url.Values{
-				"array": {"0", "0"},
-			}
-			if err := expectValues(vs, expected); err != nil {
+	t.Run("",
+		func(t *testing.T) {
+			vs, err := marshaler.MarshalValues(&MUnspecified{})
+			if err != nil {
 				t.Error(err)
+			} else {
+				expected := url.Values{
+					"array": {"0", "0"},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: omitempty, struct presence: keepempty, fields: nozero
-	{
-		vs, err := marshaler.MarshalValues(&MKeepEmpty{
-			S:     "str",
-			B:     true,
-			I:     -1,
-			I8:    -8,
-			I16:   -16,
-			I32:   -32,
-			I64:   -64,
-			U:     1,
-			U8:    8,
-			U16:   16,
-			U32:   32,
-			U64:   64,
-			F32:   32.32,
-			F64:   64.64,
-			Ptr:   &i,
-			Array: [2]int{1, 2},
-			Slice: []int{3, 4},
-			QS:    MQSBytes{1, 2, 3},
-			MEmbedded: MEmbedded{
-				MEmbedded2{
-					EI: 33,
+	t.Run("",
+		func(t *testing.T) {
+			vs, err := marshaler.MarshalValues(&MKeepEmpty{
+				S:     "str",
+				B:     true,
+				I:     -1,
+				I8:    -8,
+				I16:   -16,
+				I32:   -32,
+				I64:   -64,
+				U:     1,
+				U8:    8,
+				U16:   16,
+				U32:   32,
+				U64:   64,
+				F32:   32.32,
+				F64:   64.64,
+				Ptr:   &i,
+				Array: [2]int{1, 2},
+				Slice: []int{3, 4},
+				QS:    MQSBytes{1, 2, 3},
+				MEmbedded: MEmbedded{
+					MEmbedded2{
+						EI: 33,
+					},
 				},
-			},
-		})
-		if err != nil {
-			t.Error(err)
-		} else {
-			expected := url.Values{
-				"s":     {"str"},
-				"b":     {"true"},
-				"i":     {"-1"},
-				"i8":    {"-8"},
-				"i16":   {"-16"},
-				"i32":   {"-32"},
-				"i64":   {"-64"},
-				"u":     {"1"},
-				"u8":    {"8"},
-				"u16":   {"16"},
-				"u32":   {"32"},
-				"u64":   {"64"},
-				"f32":   {"32.32"},
-				"f64":   {"64.64"},
-				"ptr":   {"42"},
-				"array": {"1", "2"},
-				"slice": {"3", "4"},
-				"qs":    {"010203"},
-				"ei":    {"33"},
-			}
-			if err := expectValues(vs, expected); err != nil {
+			})
+			if err != nil {
 				t.Error(err)
+			} else {
+				expected := url.Values{
+					"s":     {"str"},
+					"b":     {"true"},
+					"i":     {"-1"},
+					"i8":    {"-8"},
+					"i16":   {"-16"},
+					"i32":   {"-32"},
+					"i64":   {"-64"},
+					"u":     {"1"},
+					"u8":    {"8"},
+					"u16":   {"16"},
+					"u32":   {"32"},
+					"u64":   {"64"},
+					"f32":   {"32.32"},
+					"f64":   {"64.64"},
+					"ptr":   {"42"},
+					"array": {"1", "2"},
+					"slice": {"3", "4"},
+					"qs":    {"010203"},
+					"ei":    {"33"},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: omitempty, struct presence: keepempty, fields: zero
-	{
-		vs, err := marshaler.MarshalValues(&MKeepEmpty{})
-		if err != nil {
-			t.Error(err)
-		} else {
-			expected := url.Values{
-				"s":     {""},
-				"b":     {"false"},
-				"i":     {"0"},
-				"i8":    {"0"},
-				"i16":   {"0"},
-				"i32":   {"0"},
-				"i64":   {"0"},
-				"u":     {"0"},
-				"u8":    {"0"},
-				"u16":   {"0"},
-				"u32":   {"0"},
-				"u64":   {"0"},
-				"f32":   {"0"},
-				"f64":   {"0"},
-				"array": {"0", "0"},
-				"qs":    {""},
-			}
-			if err := expectValues(vs, expected); err != nil {
+	t.Run("",
+		func(t *testing.T) {
+			vs, err := marshaler.MarshalValues(&MKeepEmpty{})
+			if err != nil {
 				t.Error(err)
+			} else {
+				expected := url.Values{
+					"s":     {""},
+					"b":     {"false"},
+					"i":     {"0"},
+					"i8":    {"0"},
+					"i16":   {"0"},
+					"i32":   {"0"},
+					"i64":   {"0"},
+					"u":     {"0"},
+					"u8":    {"0"},
+					"u16":   {"0"},
+					"u32":   {"0"},
+					"u64":   {"0"},
+					"f32":   {"0"},
+					"f64":   {"0"},
+					"array": {"0", "0"},
+					"qs":    {""},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: omitempty, struct presence: omitempty, fields: nozero
-	{
-		vs, err := marshaler.MarshalValues(&MOmitEmpty{
-			S:     "str",
-			B:     true,
-			I:     -1,
-			I8:    -8,
-			I16:   -16,
-			I32:   -32,
-			I64:   -64,
-			U:     1,
-			U8:    8,
-			U16:   16,
-			U32:   32,
-			U64:   64,
-			F32:   32.32,
-			F64:   64.64,
-			Ptr:   &i,
-			Array: [2]int{1, 2},
-			Slice: []int{3, 4},
-			QS:    MQSBytes{1, 2, 3},
-			MEmbedded: MEmbedded{
-				MEmbedded2{
-					EI: 33,
+	t.Run("",
+		func(t *testing.T) {
+			vs, err := marshaler.MarshalValues(&MOmitEmpty{
+				S:     "str",
+				B:     true,
+				I:     -1,
+				I8:    -8,
+				I16:   -16,
+				I32:   -32,
+				I64:   -64,
+				U:     1,
+				U8:    8,
+				U16:   16,
+				U32:   32,
+				U64:   64,
+				F32:   32.32,
+				F64:   64.64,
+				Ptr:   &i,
+				Array: [2]int{1, 2},
+				Slice: []int{3, 4},
+				QS:    MQSBytes{1, 2, 3},
+				MEmbedded: MEmbedded{
+					MEmbedded2{
+						EI: 33,
+					},
 				},
-			},
-		})
-		if err != nil {
-			t.Error(err)
-		} else {
-			expected := url.Values{
-				"s":     {"str"},
-				"b":     {"true"},
-				"i":     {"-1"},
-				"i8":    {"-8"},
-				"i16":   {"-16"},
-				"i32":   {"-32"},
-				"i64":   {"-64"},
-				"u":     {"1"},
-				"u8":    {"8"},
-				"u16":   {"16"},
-				"u32":   {"32"},
-				"u64":   {"64"},
-				"f32":   {"32.32"},
-				"f64":   {"64.64"},
-				"ptr":   {"42"},
-				"array": {"1", "2"},
-				"slice": {"3", "4"},
-				"qs":    {"010203"},
-				"ei":    {"33"},
-			}
-			if err := expectValues(vs, expected); err != nil {
+			})
+			if err != nil {
 				t.Error(err)
+			} else {
+				expected := url.Values{
+					"s":     {"str"},
+					"b":     {"true"},
+					"i":     {"-1"},
+					"i8":    {"-8"},
+					"i16":   {"-16"},
+					"i32":   {"-32"},
+					"i64":   {"-64"},
+					"u":     {"1"},
+					"u8":    {"8"},
+					"u16":   {"16"},
+					"u32":   {"32"},
+					"u64":   {"64"},
+					"f32":   {"32.32"},
+					"f64":   {"64.64"},
+					"ptr":   {"42"},
+					"array": {"1", "2"},
+					"slice": {"3", "4"},
+					"qs":    {"010203"},
+					"ei":    {"33"},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 
 	// default presence: omitempty, struct presence: omitempty, fields: zero
-	{
-		vs, err := marshaler.MarshalValues(&MOmitEmpty{})
-		if err != nil {
-			t.Error(err)
-		} else {
-			expected := url.Values{
-				"array": {"0", "0"},
-			}
-			if err := expectValues(vs, expected); err != nil {
+	t.Run("",
+		func(t *testing.T) {
+			vs, err := marshaler.MarshalValues(&MOmitEmpty{})
+			if err != nil {
 				t.Error(err)
+			} else {
+				expected := url.Values{
+					"array": {"0", "0"},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
 }
 
 func TestMarshalMap(t *testing.T) {
@@ -774,40 +798,91 @@ func TestMarshalMap(t *testing.T) {
 		"c": []byte{},
 	}
 
-	{
-		// default presence: keepempty
-		vs, err := MarshalValues(m)
-		if err != nil {
-			t.Error(err)
-		} else {
-			expected := url.Values{
-				"a": {"000102"},
-				"b": {"030405"},
-				"c": {""},
-			}
-			if err := expectValues(vs, expected); err != nil {
+	t.Run("keepempty",
+		func(t *testing.T) {
+			// default presence: keepempty
+			vs, err := MarshalValues(m)
+			if err != nil {
 				t.Error(err)
+			} else {
+				expected := url.Values{
+					"a": {"000102"},
+					"b": {"030405"},
+					"c": {""},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
 			}
-		}
+		},
+	)
+
+	t.Run("omitempty",
+		func(t *testing.T) {
+			marshaler := NewMarshaler(&MarshalOptions{}, WithMarshalPresence(MarshalPresenceOmitEmpty))
+
+			// default presence: omitempty
+			vs, err := marshaler.MarshalValues(m)
+			if err != nil {
+				t.Error(err)
+			} else {
+				expected := url.Values{
+					"a": {"000102"},
+					"b": {"030405"},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
+			}
+		},
+	)
+}
+
+func TestMarshalSlice(t *testing.T) {
+	s := struct {
+		A []int    `qs:"a"`
+		B []string `qs:"b"`
+	}{
+		A: []int{0, 10, 1, 2, 3, 4},
+		B: []string{"a", "b", "c", "help"},
 	}
 
-	{
-		marshaler := NewMarshaler(&MarshalOptions{}, WithMarshalPresence(MarshalPresenceOmitEmpty))
-
-		// default presence: omitempty
-		vs, err := marshaler.MarshalValues(m)
-		if err != nil {
-			t.Error(err)
-		} else {
-			expected := url.Values{
-				"a": {"000102"},
-				"b": {"030405"},
-			}
-			if err := expectValues(vs, expected); err != nil {
+	t.Run("default",
+		func(t *testing.T) {
+			// default
+			vs, err := MarshalValues(s)
+			if err != nil {
 				t.Error(err)
+			} else {
+				expected := url.Values{
+					"a": {"0", "10", "1", "2", "3", "4"},
+					"b": {"a", "b", "c", "help"},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
 			}
-		}
-	}
+		},
+	)
+	WithMarshalOptionSliceSeparator(OptionSliceSeparatorComma)
+	t.Run("comma",
+		func(t *testing.T) {
+			marshaler := NewMarshaler(&MarshalOptions{}, WithMarshalOptionSliceSeparator(OptionSliceSeparatorComma))
+			vs, err := marshaler.MarshalValues(s)
+
+			if err != nil {
+				t.Error(err)
+			} else {
+				expected := url.Values{
+					"a": {"0,10,1,2,3,4"},
+					"b": {"a,b,c,help"},
+				}
+				if err := expectValues(vs, expected); err != nil {
+					t.Error(err)
+				}
+			}
+		},
+	)
 }
 
 type MIgnoredFields struct {
@@ -856,37 +931,53 @@ type MNonMarshalable struct {
 }
 
 func TestCheckMarshal(t *testing.T) {
-	if err := CheckMarshal(&MTypes{}); err != nil {
-		t.Errorf("unexpected error :: %v", err)
-	}
-	if err := CheckMarshal(MTypes{}); err != nil {
-		t.Errorf("unexpected error :: %v", err)
-	}
+	t.Run("MTypes",
+		func(t *testing.T) {
+			if err := CheckMarshal(&MTypes{}); err != nil {
+				t.Errorf("unexpected error :: %v", err)
+			}
+			if err := CheckMarshal(MTypes{}); err != nil {
+				t.Errorf("unexpected error :: %v", err)
+			}
+		},
+	)
 
-	if err := CheckMarshal(&MNonMarshalable{}); err == nil {
-		t.Error("unexpected success")
-	}
-	if err := CheckMarshal(MNonMarshalable{}); err == nil {
-		t.Error("unexpected success")
-	}
+	t.Run("MNonMarshalable",
+		func(t *testing.T) {
+			if err := CheckMarshal(&MNonMarshalable{}); err == nil {
+				t.Error("unexpected success")
+			}
+			if err := CheckMarshal(MNonMarshalable{}); err == nil {
+				t.Error("unexpected success")
+			}
+		},
+	)
 }
 
 func TestCheckMarshalType(t *testing.T) {
-	ptrTypeOK := reflect.TypeOf((*MTypes)(nil))
+	t.Run("MTypes",
+		func(t *testing.T) {
+			ptrTypeOK := reflect.TypeOf((*MTypes)(nil))
 
-	if err := CheckMarshalType(ptrTypeOK); err != nil {
-		t.Errorf("unexpected error :: %v", err)
-	}
-	if err := CheckMarshalType(ptrTypeOK.Elem()); err != nil {
-		t.Errorf("unexpected error :: %v", err)
-	}
+			if err := CheckMarshalType(ptrTypeOK); err != nil {
+				t.Errorf("unexpected error :: %v", err)
+			}
+			if err := CheckMarshalType(ptrTypeOK.Elem()); err != nil {
+				t.Errorf("unexpected error :: %v", err)
+			}
+		},
+	)
 
-	ptrTypeNotOK := reflect.TypeOf((*MNonMarshalable)(nil))
+	t.Run("MNonMarshalable",
+		func(t *testing.T) {
+			ptrTypeNotOK := reflect.TypeOf((*MNonMarshalable)(nil))
 
-	if err := CheckMarshalType(ptrTypeNotOK); err == nil {
-		t.Error("unexpected success")
-	}
-	if err := CheckMarshalType(ptrTypeNotOK.Elem()); err == nil {
-		t.Error("unexpected success")
-	}
+			if err := CheckMarshalType(ptrTypeNotOK); err == nil {
+				t.Error("unexpected success")
+			}
+			if err := CheckMarshalType(ptrTypeNotOK.Elem()); err == nil {
+				t.Error("unexpected success")
+			}
+		},
+	)
 }

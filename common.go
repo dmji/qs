@@ -30,20 +30,19 @@ var (
 )
 
 type ParsedTagInfo struct {
-	Name                          string
-	MarshalPresence               MarshalPresence
-	UnmarshalPresence             UnmarshalPresence
-	UnmarshalSliceValues          UnmarshalSliceValues
-	UnmarshalSliceUnexpectedValue UnmarshalSliceUnexpectedValue
+	Name            string
+	MarshalPresence MarshalPresence
+	UnmarshalOpts   *UnmarshalTagOptions
+	CommonOpts      *CommonTagOptions
 }
 
-func getStructFieldInfo(field reflect.StructField, nt NameTransformFunc, defaultMarshalPresence MarshalPresence, defaultUnmarshalPresence UnmarshalPresence) (*ParsedTagInfo, error) {
+func getStructFieldInfo(field reflect.StructField, nt NameTransformFunc, defaultMarshalTagOptions *MarshalTagOptions, defaultUnmarshalTagOptions *UnmarshalTagOptions, defaultCommonTagOptions *CommonTagOptions) (*ParsedTagInfo, error) {
 	// Skipping unexported fields.
 	if field.PkgPath != "" && !field.Anonymous {
 		return nil, nil
 	}
 
-	tag, err := parseFieldTag(field.Tag, defaultMarshalPresence, defaultUnmarshalPresence)
+	tag, err := parseFieldTag(field.Tag, defaultMarshalTagOptions, defaultUnmarshalTagOptions, defaultCommonTagOptions)
 	if err != nil {
 		err = fmt.Errorf("invalid tag: %q :: %v", field.Tag, err)
 		return nil, err
@@ -63,15 +62,14 @@ func getStructFieldInfo(field reflect.StructField, nt NameTransformFunc, default
 
 const fmtOptionNotUniqueError = "only one %s option is allwed - you've specified at least two: %v, %v"
 
-func parseFieldTag(tagStr reflect.StructTag, defaultMarshalPresence MarshalPresence, defaultUnmarshalPresence UnmarshalPresence) (*ParsedTagInfo, error) {
+func parseFieldTag(tagStr reflect.StructTag, defaultMarshalTagOptions *MarshalTagOptions, defaultUnmarshalTagOptions *UnmarshalTagOptions, defaultCommonTagOptions *CommonTagOptions) (*ParsedTagInfo, error) {
 	v := tagStr.Get(tagKey)
 	nameAndOptions := strings.Split(v, ",")
 	tag := &ParsedTagInfo{
-		Name:                          nameAndOptions[0],
-		MarshalPresence:               MarshalPresenceMPUnspecified,
-		UnmarshalPresence:             UnmarshalPresenceUPUnspecified,
-		UnmarshalSliceValues:          UnmarshalSliceValuesUPUnspecified,
-		UnmarshalSliceUnexpectedValue: UnmarshalSliceUnexpectedValueUPUnspecified,
+		Name:            nameAndOptions[0],
+		MarshalPresence: MarshalPresenceMPUnspecified,
+		UnmarshalOpts:   NewUndefinedUnmarshalTagOptions(),
+		CommonOpts:      NewUndefinedCommonTagOptions(),
 	}
 
 	options := nameAndOptions[1:]
@@ -80,56 +78,39 @@ func parseFieldTag(tagStr reflect.StructTag, defaultMarshalPresence MarshalPrese
 	}
 
 	for _, option := range options {
-		bErr := true
 
-		// UnmarshalPresence
-		if value, err := UnmarshalPresenceFromString(option); err == nil {
-			if tag.UnmarshalPresence != UnmarshalPresenceUPUnspecified {
-				return nil, fmt.Errorf(fmtOptionNotUniqueError, "UnmarshalPresence", tag.UnmarshalPresence, v)
-			}
-			tag.UnmarshalPresence = value
-			bErr = false
+		bCommonOptFound, err := tag.CommonOpts.ParseOption(option)
+		if err != nil {
+			return nil, err
 		}
 
-		// UnmarshalSliceValues
-		if value, err := UnmarshalSliceValuesFromString(option); err == nil {
-			if tag.UnmarshalSliceValues != UnmarshalSliceValuesUPUnspecified {
-				return nil, fmt.Errorf(fmtOptionNotUniqueError, "UnmarshalSliceValues", tag.UnmarshalSliceValues, v)
-			}
-			tag.UnmarshalSliceValues = value
-			bErr = false
-		}
-
-		// UnmarshalSliceValues
-		if value, err := UnmarshalSliceUnexpectedValueFromString(option); err == nil {
-			if tag.UnmarshalSliceUnexpectedValue != UnmarshalSliceUnexpectedValueUPUnspecified {
-				return nil, fmt.Errorf(fmtOptionNotUniqueError, "UnmarshalSliceUnexpectedValue", tag.UnmarshalSliceUnexpectedValue, v)
-			}
-			tag.UnmarshalSliceUnexpectedValue = value
-			bErr = false
+		bUnmarshalOptFound, err := tag.UnmarshalOpts.ParseOption(option)
+		if err != nil {
+			return nil, err
 		}
 
 		// MarshalPresence
+		bMarshalOptFound := false
 		if value, err := MarshalPresenceFromString(option); err == nil {
 			if tag.MarshalPresence != MarshalPresenceMPUnspecified {
 				return nil, fmt.Errorf(fmtOptionNotUniqueError, "MarshalPresence", tag.MarshalPresence, v)
 			}
 			tag.MarshalPresence = value
-			bErr = false
+			bMarshalOptFound = true
 		}
 
 		// Error specified option name is invalid
-		if bErr {
+		if !bCommonOptFound && !bUnmarshalOptFound && !bMarshalOptFound {
 			return nil, fmt.Errorf("invalid option in field tag: %q", option)
 		}
 	}
 
 	if tag.MarshalPresence == MarshalPresenceMPUnspecified {
-		tag.MarshalPresence = defaultMarshalPresence
+		tag.MarshalPresence = defaultMarshalTagOptions.Presence
 	}
-	if tag.UnmarshalPresence == UnmarshalPresenceUPUnspecified {
-		tag.UnmarshalPresence = defaultUnmarshalPresence
-	}
+
+	tag.UnmarshalOpts.ApplyDefaults(defaultUnmarshalTagOptions)
+	tag.CommonOpts.ApplyDefaults(defaultCommonTagOptions)
 
 	return tag, nil
 }

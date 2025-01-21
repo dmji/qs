@@ -66,7 +66,7 @@ func newFieldUnmarshaler(sf reflect.StructField, opts *UnmarshalerDefaultOptions
 	var vum ValuesUnmarshaler
 	var fum *fieldUnmarshaler
 
-	tag, err := getStructFieldInfo(sf, opts.NameTransformer, MarshalPresenceMPUnspecified, opts.DefaultUnmarshalPresence)
+	tag, err := getStructFieldInfo(sf, opts.NameTransformer, NewUndefinedMarshalTagOptions(), opts.TagOptionsDefaults, opts.TagCommonOptionsDefaults)
 	if tag == nil || err != nil {
 		return vum, fum, err
 	}
@@ -103,14 +103,14 @@ func (p *structUnmarshaler) UnmarshalValues(v reflect.Value, vs url.Values, opts
 	for _, fum := range p.Fields {
 		a, ok := vs[fum.Tag.Name]
 		if !ok {
-			if fum.Tag.UnmarshalPresence == UnmarshalPresenceReq {
+			switch fum.Tag.UnmarshalOpts.Presence {
+			case UnmarshalPresenceNil:
+				continue
+			case UnmarshalPresenceReq:
 				return &ReqError{
 					Message:   fmt.Sprintf("missing required field %q in struct %v", fum.Tag.Name, t),
 					FieldName: fum.Tag.Name,
 				}
-			}
-			if fum.Tag.UnmarshalPresence == UnmarshalPresenceNil {
-				continue
 			}
 		}
 		err := fum.Unmarshaler.Unmarshal(v.Field(fum.FieldIndex), a, NewUnmarshalOptions(opts, fum.Tag))

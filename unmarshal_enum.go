@@ -1,6 +1,6 @@
 package qs
 
-//go:generate go run github.com/dmji/go-stringer@latest -type=UnmarshalPresence,UnmarshalSliceValues,UnmarshalSliceUnexpectedValue --trimprefix=@me -output unmarshal_string.go -nametransform=lower -fromstringgenfn
+//go:generate go run github.com/dmji/go-stringer@latest -type=UnmarshalPresence,UnmarshalSliceValues,UnmarshalSliceUnexpectedValue --trimprefix=@me -output unmarshal_enum_string.go -nametransform=lower -fromstringgenfn
 
 // UnmarshalPresence is an enum that controls the unmarshaling of fields.
 // This option is used by the unmarshaler only if the given field isn't present

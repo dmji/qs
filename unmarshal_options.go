@@ -42,12 +42,9 @@ type UnmarshalerDefaultOptions struct {
 	// a default builtin factory.
 	UnmarshalerFactory UnmarshalerFactory
 
-	// DefaultUnmarshalPresence is used for the unmarshaling of struct fields
-	// that don't have an explicit UnmarshalPresence option set in their tags.
-	DefaultUnmarshalPresence UnmarshalPresence
-
-	DefaultUnmarshalSliceValues          UnmarshalSliceValues
-	DefaultUnmarshalSliceUnexpectedValue UnmarshalSliceUnexpectedValue
+	// Defaults for tag  options
+	TagOptionsDefaults       *UnmarshalTagOptions
+	TagCommonOptionsDefaults *CommonTagOptions
 }
 
 // NewDefaultUnmarshalOptions creates a new UnmarshalOptions in which every field
@@ -83,17 +80,19 @@ func prepareUnmarshalOptions(opts UnmarshalerDefaultOptions) *UnmarshalerDefault
 	}
 	opts.UnmarshalerFactory = newUnmarshalerCache(opts.UnmarshalerFactory)
 
-	if opts.DefaultUnmarshalPresence == UnmarshalPresenceUPUnspecified {
-		opts.DefaultUnmarshalPresence = UnmarshalPresenceOpt
+	// Init Unmarshal Tag Options
+	if opts.TagOptionsDefaults == nil {
+		opts.TagOptionsDefaults = NewUndefinedUnmarshalTagOptions()
 	}
 
-	if opts.DefaultUnmarshalSliceValues == UnmarshalSliceValuesUPUnspecified {
-		opts.DefaultUnmarshalSliceValues = UnmarshalSliceValuesOverrideOld
+	opts.TagOptionsDefaults.InitDefaults()
+
+	// Init Common Tag Options
+	if opts.TagCommonOptionsDefaults == nil {
+		opts.TagCommonOptionsDefaults = NewUndefinedCommonTagOptions()
 	}
 
-	if opts.DefaultUnmarshalSliceUnexpectedValue == UnmarshalSliceUnexpectedValueUPUnspecified {
-		opts.DefaultUnmarshalSliceUnexpectedValue = UnmarshalSliceUnexpectedValueBreakWithError
-	}
+	opts.TagCommonOptionsDefaults.InitDefaults()
 
 	return &opts
 }
@@ -101,19 +100,25 @@ func prepareUnmarshalOptions(opts UnmarshalerDefaultOptions) *UnmarshalerDefault
 // option appliers
 func WithUnmarshalPresence(value UnmarshalPresence) func(*QSUnmarshaler) {
 	return func(m *QSUnmarshaler) {
-		m.opts.DefaultUnmarshalPresence = value
+		m.opts.TagOptionsDefaults.Presence = value
 	}
 }
 
 func WithUnmarshalSliceValues(value UnmarshalSliceValues) func(*QSUnmarshaler) {
 	return func(m *QSUnmarshaler) {
-		m.opts.DefaultUnmarshalSliceValues = value
+		m.opts.TagOptionsDefaults.SliceValues = value
 	}
 }
 
 func WithUnmarshalSliceUnexpectedValue(value UnmarshalSliceUnexpectedValue) func(*QSUnmarshaler) {
 	return func(m *QSUnmarshaler) {
-		m.opts.DefaultUnmarshalSliceUnexpectedValue = value
+		m.opts.TagOptionsDefaults.SliceUnexpectedValue = value
+	}
+}
+
+func WithUnmarshalOptionSliceSeparator(value OptionSliceSeparator) func(*QSUnmarshaler) {
+	return func(m *QSUnmarshaler) {
+		m.opts.TagCommonOptionsDefaults.SliceSeparator = value
 	}
 }
 
@@ -145,11 +150,10 @@ func (o *UnmarshalOptions) SliceToString(s []string) (string, error) {
 func NewUnmarshalOptions(opt *UnmarshalerDefaultOptions, tag *ParsedTagInfo) *UnmarshalOptions {
 	if tag == nil {
 		tag = &ParsedTagInfo{
-			Name:                          "",
-			MarshalPresence:               MarshalPresenceMPUnspecified,
-			UnmarshalPresence:             opt.DefaultUnmarshalPresence,
-			UnmarshalSliceValues:          opt.DefaultUnmarshalSliceValues,
-			UnmarshalSliceUnexpectedValue: opt.DefaultUnmarshalSliceUnexpectedValue,
+			Name:            "",
+			MarshalPresence: MarshalPresenceMPUnspecified,
+			UnmarshalOpts:   opt.TagOptionsDefaults,
+			CommonOpts:      opt.TagCommonOptionsDefaults,
 		}
 	}
 

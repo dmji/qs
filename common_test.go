@@ -8,44 +8,123 @@ import (
 
 type defaultPresenceTestCase struct {
 	tagStr    reflect.StructTag
-	defaultMP MarshalPresence
-	mp        MarshalPresence
-	defaultUP UnmarshalPresence
-	up        UnmarshalPresence
+	defaultMO MarshalTagOptions
+	mo        MarshalTagOptions
+	defaultUO UnmarshalTagOptions
+	uo        UnmarshalTagOptions
 }
 
 func TestParseTag_DefaultPresence(t *testing.T) {
 	testCases := []defaultPresenceTestCase{
-		{`qs:"name"`, MarshalPresenceKeepEmpty, MarshalPresenceKeepEmpty, UnmarshalPresenceNil, UnmarshalPresenceNil},
-		{`qs:"name"`, MarshalPresenceOmitEmpty, MarshalPresenceOmitEmpty, UnmarshalPresenceOpt, UnmarshalPresenceOpt},
-		{`qs:"name"`, MarshalPresenceOmitEmpty, MarshalPresenceOmitEmpty, UnmarshalPresenceReq, UnmarshalPresenceReq},
-		{`qs:"name,omitempty"`, MarshalPresenceKeepEmpty, MarshalPresenceOmitEmpty, UnmarshalPresenceNil, UnmarshalPresenceNil},
-		{`qs:"name,keepempty"`, MarshalPresenceKeepEmpty, MarshalPresenceKeepEmpty, UnmarshalPresenceNil, UnmarshalPresenceNil},
-		{`qs:"name,omitempty"`, MarshalPresenceOmitEmpty, MarshalPresenceOmitEmpty, UnmarshalPresenceNil, UnmarshalPresenceNil},
-		{`qs:"name,keepempty"`, MarshalPresenceOmitEmpty, MarshalPresenceKeepEmpty, UnmarshalPresenceNil, UnmarshalPresenceNil},
-		{`qs:"name,nil"`, MarshalPresenceKeepEmpty, MarshalPresenceKeepEmpty, UnmarshalPresenceOpt, UnmarshalPresenceNil},
-		{`qs:"name,opt"`, MarshalPresenceKeepEmpty, MarshalPresenceKeepEmpty, UnmarshalPresenceNil, UnmarshalPresenceOpt},
-		{`qs:"name,req"`, MarshalPresenceKeepEmpty, MarshalPresenceKeepEmpty, UnmarshalPresenceNil, UnmarshalPresenceReq},
-		{`qs:"name,keepempty,opt"`, MarshalPresenceOmitEmpty, MarshalPresenceKeepEmpty, UnmarshalPresenceNil, UnmarshalPresenceOpt},
+		{
+			`qs:"name"`,
+			MarshalTagOptions{MarshalPresenceKeepEmpty},
+			MarshalTagOptions{MarshalPresenceKeepEmpty},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceNil},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceNil},
+		},
+		{
+			`qs:"name"`,
+			MarshalTagOptions{MarshalPresenceOmitEmpty},
+			MarshalTagOptions{MarshalPresenceOmitEmpty},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceOpt},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceOpt},
+		},
+		{
+			`qs:"name"`,
+			MarshalTagOptions{MarshalPresenceOmitEmpty},
+			MarshalTagOptions{MarshalPresenceOmitEmpty},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceReq},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceReq},
+		},
+		{
+			`qs:"name,omitempty"`,
+			MarshalTagOptions{MarshalPresenceKeepEmpty},
+			MarshalTagOptions{MarshalPresenceOmitEmpty},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceNil},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceNil},
+		},
+		{
+			`qs:"name,keepempty"`,
+			MarshalTagOptions{MarshalPresenceKeepEmpty},
+			MarshalTagOptions{MarshalPresenceKeepEmpty},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceNil},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceNil},
+		},
+		{
+			`qs:"name,omitempty"`,
+			MarshalTagOptions{MarshalPresenceOmitEmpty},
+			MarshalTagOptions{MarshalPresenceOmitEmpty},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceNil},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceNil},
+		},
+		{
+			`qs:"name,keepempty"`,
+			MarshalTagOptions{MarshalPresenceOmitEmpty},
+			MarshalTagOptions{MarshalPresenceKeepEmpty},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceNil},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceNil},
+		},
+		{
+			`qs:"name,nil"`,
+			MarshalTagOptions{MarshalPresenceKeepEmpty},
+			MarshalTagOptions{MarshalPresenceKeepEmpty},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceOpt},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceNil},
+		},
+		{
+			`qs:"name,opt"`,
+			MarshalTagOptions{MarshalPresenceKeepEmpty},
+			MarshalTagOptions{MarshalPresenceKeepEmpty},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceNil},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceOpt},
+		},
+		{
+			`qs:"name,req"`,
+			MarshalTagOptions{MarshalPresenceKeepEmpty},
+			MarshalTagOptions{MarshalPresenceKeepEmpty},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceNil},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceReq},
+		},
+		{
+			`qs:"name,keepempty,opt"`,
+			MarshalTagOptions{MarshalPresenceOmitEmpty},
+			MarshalTagOptions{MarshalPresenceKeepEmpty},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceNil},
+			UnmarshalTagOptions{Presence: UnmarshalPresenceOpt},
+		},
 	}
 
+	defaultCommon := NewUndefinedCommonTagOptions()
+	defaultCommon.InitDefaults()
+
 	for _, tc := range testCases {
-		tag, err := parseFieldTag(tc.tagStr, tc.defaultMP, tc.defaultUP)
-		if err != nil {
-			t.Errorf("unexpected error - tag: %q :: %v", tc.tagStr, err)
-			continue
-		}
-		if tag.Name != "name" {
-			t.Errorf("tag.Name == %q, want %q", tag.Name, "name")
-		}
-		if tag.MarshalPresence != tc.mp {
-			t.Errorf("tag=%q, DefaultMarshalPresence=%v, MarshalPresence=%v, want %v",
-				tc.tagStr, tc.defaultMP, tag.MarshalPresence, tc.mp)
-		}
-		if tag.UnmarshalPresence != tc.up {
-			t.Errorf("tag=%q, DefaultUnmarshalPresence=%v, UnmarshalPresence=%v, want %v",
-				tc.tagStr, tc.defaultUP, tag.UnmarshalPresence, tc.up)
-		}
+		t.Run("",
+			func(t *testing.T) {
+				tc.defaultUO.InitDefaults()
+				tc.uo.ApplyDefaults(&tc.defaultUO)
+
+				tc.defaultMO.InitDefaults()
+				tc.mo.ApplyDefaults(&tc.defaultMO)
+
+				tag, err := parseFieldTag(tc.tagStr, &tc.defaultMO, &tc.defaultUO, defaultCommon)
+				if err != nil {
+					t.Errorf("unexpected error - tag: %q :: %v", tc.tagStr, err)
+					return
+				}
+				if tag.Name != "name" {
+					t.Errorf("tag.Name == %q, want %q", tag.Name, "name")
+				}
+				if tag.MarshalPresence != tc.mo.Presence {
+					t.Errorf("tag=%q, DefaultMarshalPresence=%v, MarshalPresence=%v, want %v",
+						tc.tagStr, tc.defaultMO.Presence, tag.MarshalPresence, tc.mo.Presence)
+				}
+				if tag.UnmarshalOpts.Presence != tc.uo.Presence {
+					t.Errorf("tag=%q, DefaultUnmarshalPresence=%v, UnmarshalPresence=%v, want %v",
+						tc.tagStr, tc.defaultUO, tag.UnmarshalOpts.Presence, tc.uo.Presence)
+				}
+			},
+		)
 	}
 }
 
@@ -61,8 +140,18 @@ func TestParseTag_SurplusComma(t *testing.T) {
 		`qs:"-,,opt"`,
 		`qs:"name,,opt"`,
 	}
+
+	defaultCommon := NewUndefinedCommonTagOptions()
+	defaultCommon.InitDefaults()
+
+	defaultUO := &UnmarshalTagOptions{Presence: UnmarshalPresenceOpt}
+	defaultUO.InitDefaults()
+
+	defaultMO := &MarshalTagOptions{Presence: MarshalPresenceKeepEmpty}
+	defaultMO.InitDefaults()
+
 	for _, tagStr := range tagStrList {
-		_, err := parseFieldTag(tagStr, MarshalPresenceKeepEmpty, UnmarshalPresenceOpt)
+		_, err := parseFieldTag(tagStr, defaultMO, defaultUO, defaultCommon)
 		if err == nil {
 			t.Errorf("unexpected success - tag: %q", tagStr)
 			continue
@@ -90,8 +179,18 @@ func TestParseTag_IncompatibleOptions(t *testing.T) {
 		`qs:",keepempty,omitempty"`,
 		`qs:",omitempty,keepempty"`,
 	}
+
+	defaultCommon := NewUndefinedCommonTagOptions()
+	defaultCommon.InitDefaults()
+
+	defaultUO := &UnmarshalTagOptions{Presence: UnmarshalPresenceOpt}
+	defaultUO.InitDefaults()
+
+	defaultMO := &MarshalTagOptions{Presence: MarshalPresenceKeepEmpty}
+	defaultMO.InitDefaults()
+
 	for _, tagStr := range tagStrList {
-		_, err := parseFieldTag(tagStr, MarshalPresenceKeepEmpty, UnmarshalPresenceOpt)
+		_, err := parseFieldTag(tagStr, defaultMO, defaultUO, defaultCommon)
 		if err == nil {
 			t.Errorf("unexpected success - tag: %q", tagStr)
 			continue

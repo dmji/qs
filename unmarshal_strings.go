@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -104,21 +105,47 @@ func newSliceUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (Unmarshaler, e
 	}, nil
 }
 
+func splitArrayBySeparatorWithSameOrder(a []string, separatorType OptionSliceSeparator) []string {
+	sep := ""
+	switch separatorType {
+	case OptionSliceSeparatorComma:
+		sep = ","
+	case OptionSliceSeparatorSemicolon:
+		sep = ";"
+	case OptionSliceSeparatorSpace:
+		sep = " "
+	case OptionSliceSeparatorNone:
+	default:
+		panic(fmt.Sprintf("unexpected qs.OptionSliceSeparator: %#v", separatorType))
+	}
+	if len(sep) == 0 {
+		return a
+	}
+
+	vals := make([]string, 0, 2*len(a))
+	for _, s := range a {
+		vals = append(vals, strings.Split(s, sep)...)
+	}
+	return vals
+}
+
 func (p *sliceUnmarshaler) Unmarshal(v reflect.Value, a []string, opts *UnmarshalOptions) error {
 	t := v.Type()
 	if t != p.Type {
 		return &WrongTypeError{Actual: t, Expected: p.Type}
 	}
 
+	vals := splitArrayBySeparatorWithSameOrder(a, opts.ParsedTagInfo.CommonOpts.SliceSeparator)
+
 	// resize or create slice
 	n := 0
 	if v.IsNil() {
-		v.Set(reflect.MakeSlice(t, len(a), len(a)))
+		v.Set(reflect.MakeSlice(t, len(vals), len(vals)))
 	} else {
-		keepPrevValues := opts.ParsedTagInfo.UnmarshalSliceValues == UnmarshalSliceValuesKeepOld
+		keepPrevValues := opts.ParsedTagInfo.UnmarshalOpts.SliceValues == UnmarshalSliceValuesKeepOld
 
 		oldLen := v.Len()
-		newLen := len(a)
+		newLen := len(vals)
 		if keepPrevValues {
 			n = oldLen
 			newLen += oldLen
@@ -133,27 +160,30 @@ func (p *sliceUnmarshaler) Unmarshal(v reflect.Value, a []string, opts *Unmarsha
 		v.Set(s)
 	}
 
-	breakOnError := opts.ParsedTagInfo.UnmarshalSliceUnexpectedValue == UnmarshalSliceUnexpectedValueBreakWithError
+	breakOnError := opts.ParsedTagInfo.UnmarshalOpts.SliceUnexpectedValue == UnmarshalSliceUnexpectedValueBreakWithError
 
 	// unmarshal elements of slice
 	var errLoop error
-	for i := range a {
-		err := p.ElemUnmarshaler.Unmarshal(v.Index(n), a[i:i+1], opts)
+	for i := range vals {
+		err := p.ElemUnmarshaler.Unmarshal(v.Index(n), vals[i:i+1], opts)
 		if err == nil {
 			n++
-		} else if breakOnError {
+			continue
+		}
+
+		if breakOnError {
 			errLoop = fmt.Errorf("error unmarshaling slice index %v :: %v", i, err)
 			break
 		}
 	}
 
 	// cut unmarshleable values from slice or clear if error occurred
-	if errLoop == nil {
-		v.Set(v.Slice(0, n))
-	} else {
+	if errLoop != nil {
 		v.Set(v.Slice(0, 0))
+		return errLoop
 	}
 
+	v.Set(v.Slice(0, n))
 	return nil
 }
 

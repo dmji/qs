@@ -21,11 +21,9 @@ type MarshalOptions struct {
 	// a default builtin factory.
 	MarshalerFactory MarshalerFactory
 
-	// DefaultMarshalPresence is used for the marshaling of struct fields that
-	// don't have an explicit MarshalPresence option set in their tags.
-	// This option is used for every item when you marshal a map[string]WhateverType
-	// instead of a struct because map items can't have a tag to override this.
-	_DefaultMarshalPresence MarshalPresence
+	// Defaults for tag  options
+	TagOptionsDefaults       *MarshalTagOptions
+	TagCommonOptionsDefaults *CommonTagOptions
 }
 
 // NewDefaultMarshalOptions creates a new MarshalOptions in which every field
@@ -35,7 +33,6 @@ func NewDefaultMarshalOptions() *MarshalOptions {
 }
 
 func prepareMarshalOptions(opts MarshalOptions) *MarshalOptions {
-
 	if opts.NameTransformer == nil {
 		opts.NameTransformer = snakeCase
 	}
@@ -50,21 +47,38 @@ func prepareMarshalOptions(opts MarshalOptions) *MarshalOptions {
 	}
 	opts.MarshalerFactory = newMarshalerCache(opts.MarshalerFactory)
 
-	if opts._DefaultMarshalPresence == MarshalPresenceMPUnspecified {
-		opts._DefaultMarshalPresence = MarshalPresenceKeepEmpty
+	// Init Unmarshal Tag Options
+	if opts.TagOptionsDefaults == nil {
+		opts.TagOptionsDefaults = NewUndefinedMarshalTagOptions()
 	}
+
+	opts.TagOptionsDefaults.InitDefaults()
+
+	// Init Common Tag Options
+	if opts.TagCommonOptionsDefaults == nil {
+		opts.TagCommonOptionsDefaults = NewUndefinedCommonTagOptions()
+	}
+
+	opts.TagCommonOptionsDefaults.InitDefaults()
+
 	return &opts
 }
 
 // option appliers
 func WithMarshalPresence(presence MarshalPresence) func(*QSMarshaler) {
 	return func(m *QSMarshaler) {
-		m.opts._DefaultMarshalPresence = presence
+		m.opts.TagOptionsDefaults.Presence = presence
 	}
 }
 
 func WithCustomUrlQueryToStringEncoder(fn func(values url.Values) string) func(*QSMarshaler) {
 	return func(m *QSMarshaler) {
 		m._EncodeValues = fn
+	}
+}
+
+func WithMarshalOptionSliceSeparator(value OptionSliceSeparator) func(*QSMarshaler) {
+	return func(m *QSMarshaler) {
+		m.opts.TagCommonOptionsDefaults.SliceSeparator = value
 	}
 }

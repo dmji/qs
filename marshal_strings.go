@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -82,6 +83,24 @@ func (p *arrayAndSliceMarshaler) Marshal(v reflect.Value, opts *MarshalOptions) 
 		}
 		a[i] = a2[0]
 	}
+
+	sep := ""
+	switch opts.TagCommonOptionsDefaults.SliceSeparator {
+	case OptionSliceSeparatorNone:
+	case OptionSliceSeparatorComma:
+		sep = ","
+	case OptionSliceSeparatorSemicolon:
+		sep = ";"
+	case OptionSliceSeparatorSpace:
+		sep = " "
+	default:
+		panic(fmt.Sprintf("unexpected qs.OptionSliceSeparator: %#v", opts.TagCommonOptionsDefaults.SliceSeparator))
+	}
+
+	if len(sep) != 0 {
+		return []string{strings.Join(a, sep)}, nil
+	}
+
 	return a, nil
 }
 
