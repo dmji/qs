@@ -15,6 +15,8 @@ so this package can be used for that as well.
   - Union duplicated code in cache structs to generic cacher
 - Improved custom marshaler workflow
   - Added register handlers instead of composition
+  - Added split/merge slice values with separator
+  - Added option to supress error on unmarshal unexpected value in slice field
 
 # Quick Intro
 
