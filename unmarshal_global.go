@@ -7,7 +7,7 @@ import (
 
 // DefaultUnmarshaler is the unmarshaler used by the Unmarshal, UnmarshalValues,
 // CanUnmarshal and CanUnmarshalType functions.
-var DefaultUnmarshaler = NewUnmarshaler(&UnmarshalOptions{})
+var DefaultUnmarshaler = NewUnmarshaler(&UnmarshalerDefaultOptions{})
 
 // Unmarshal unmarshals a query string and stores the result to the object
 // pointed to by the given pointer.
@@ -60,12 +60,10 @@ func CheckUnmarshalType(t reflect.Type) error {
 
 func RegisterSubFactoryUnmarshaler(k reflect.Kind, fn UnmarshalerFactoryFunc) error {
 	return DefaultUnmarshaler.opts.UnmarshalerFactory.RegisterSubFactory(k, fn)
-
 }
 
 func RegisterCustomTypeUnmarshaler(k reflect.Type, fn PrimitiveUnmarshalerFunc) error {
 	return DefaultUnmarshaler.opts.UnmarshalerFactory.RegisterCustomType(k, fn)
-
 }
 
 func RegisterKindOverrideUnmarshaler(k reflect.Kind, fn PrimitiveUnmarshalerFunc) error {

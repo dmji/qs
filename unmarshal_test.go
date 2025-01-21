@@ -634,7 +634,7 @@ func TestDefaultNil(t *testing.T) {
 		"ei=33",
 	}, "&")
 
-	unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceNil))
+	unmarshaler := NewUnmarshaler(&UnmarshalerDefaultOptions{}, WithUnmarshalPresence(UnmarshalPresenceNil))
 
 	// default presence: nil, struct presence: unspecified, queryString: nozero
 	t.Run("unspecified nozero",
@@ -909,7 +909,7 @@ func TestDefaultReq(t *testing.T) {
 		"ei=33",
 	}, "&")
 
-	unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
+	unmarshaler := NewUnmarshaler(&UnmarshalerDefaultOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
 
 	// default presence: req, struct presence: unspecified, queryString: nozero
 	t.Run("",
@@ -1095,7 +1095,7 @@ func TestDefaultReq(t *testing.T) {
 
 func TestUnmarshalMap(t *testing.T) {
 	// Req should be ingored and shouldn't be a problem in case of map unmarshaling.
-	unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
+	unmarshaler := NewUnmarshaler(&UnmarshalerDefaultOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
 
 	t.Run("nil",
 		func(t *testing.T) {
@@ -1180,7 +1180,7 @@ func TestUnmarshalSlice(t *testing.T) {
 			s := struct {
 				A []int `qs:"a"`
 			}{}
-			unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
+			unmarshaler := NewUnmarshaler(&UnmarshalerDefaultOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
 			err := unmarshaler.Unmarshal(&s, "a=1&a=2&a=3&a=4")
 			if err != nil {
 				t.Error(err)
@@ -1203,7 +1203,9 @@ func TestUnmarshalSlice(t *testing.T) {
 			}{
 				A: []int{0, 10},
 			}
-			unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
+			unmarshaler := NewUnmarshaler(&UnmarshalerDefaultOptions{},
+				WithUnmarshalPresence(UnmarshalPresenceReq),
+				WithUnmarshalSliceValues(UnmarshalSliceValuesKeepOld))
 			err := unmarshaler.Unmarshal(&s, "a=1&a=2&a=3&a=4")
 			if err != nil {
 				t.Error(err)
@@ -1226,7 +1228,7 @@ func TestUnmarshalSlice(t *testing.T) {
 			}{
 				A: []int{0, 10},
 			}
-			unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
+			unmarshaler := NewUnmarshaler(&UnmarshalerDefaultOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
 			err := unmarshaler.Unmarshal(&s, "a=1&a=2&a=3&a=4")
 			if err != nil {
 				t.Error(err)
@@ -1247,7 +1249,11 @@ func TestUnmarshalSlice(t *testing.T) {
 			s := struct {
 				A []int `qs:"a"`
 			}{}
-			unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
+			unmarshaler := NewUnmarshaler(
+				&UnmarshalerDefaultOptions{},
+				WithUnmarshalPresence(UnmarshalPresenceReq),
+				WithUnmarshalSliceUnexpectedValue(UnmarshalSliceUnexpectedValueBreakWithError),
+			)
 			err := unmarshaler.Unmarshal(&s, "a=1&a=2&a=help&a=4")
 			if err == nil {
 				t.Error("unexpected success")
@@ -1266,7 +1272,10 @@ func TestUnmarshalSlice(t *testing.T) {
 			s := struct {
 				A []int `qs:"a"`
 			}{}
-			unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
+			unmarshaler := NewUnmarshaler(&UnmarshalerDefaultOptions{},
+				WithUnmarshalPresence(UnmarshalPresenceReq),
+				WithUnmarshalSliceUnexpectedValue(UnmarshalSliceUnexpectedValueSkip),
+			)
 			err := unmarshaler.Unmarshal(&s, "a=1&a=2&a=help&a=4")
 			if err != nil {
 				t.Error(err)
@@ -1287,7 +1296,7 @@ func TestUnmarshalSlice(t *testing.T) {
 			s := struct {
 				A []int `qs:"a"`
 			}{}
-			unmarshaler := NewUnmarshaler(&UnmarshalOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
+			unmarshaler := NewUnmarshaler(&UnmarshalerDefaultOptions{}, WithUnmarshalPresence(UnmarshalPresenceReq))
 			err := unmarshaler.Unmarshal(&s, "a=1,2,3,4")
 			if err != nil {
 				t.Error(err)

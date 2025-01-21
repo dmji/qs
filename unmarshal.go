@@ -10,13 +10,13 @@ import (
 // QSUnmarshaler objects can be created by calling NewUnmarshaler and they can be
 // used to unmarshal query strings or url.Values into structs or maps.
 type QSUnmarshaler struct {
-	opts *UnmarshalOptions
+	opts *UnmarshalerDefaultOptions
 
 	stringToQueryParser func(query string) (url.Values, error)
 }
 
 // NewUnmarshaler returns a new QSUnmarshaler object.
-func NewUnmarshaler(prm *UnmarshalOptions, opts ...func(p *QSUnmarshaler)) *QSUnmarshaler {
+func NewUnmarshaler(prm *UnmarshalerDefaultOptions, opts ...func(p *QSUnmarshaler)) *QSUnmarshaler {
 	p := &QSUnmarshaler{
 		opts:                prepareUnmarshalOptions(*prm),
 		stringToQueryParser: url.ParseQuery,
@@ -31,12 +31,10 @@ func NewUnmarshaler(prm *UnmarshalOptions, opts ...func(p *QSUnmarshaler)) *QSUn
 
 func (p *QSUnmarshaler) RegisterSubFactory(k reflect.Kind, fn UnmarshalerFactoryFunc) error {
 	return p.opts.UnmarshalerFactory.RegisterSubFactory(k, fn)
-
 }
 
 func (p *QSUnmarshaler) RegisterCustomType(k reflect.Type, fn PrimitiveUnmarshalerFunc) error {
 	return p.opts.UnmarshalerFactory.RegisterCustomType(k, fn)
-
 }
 
 func (p *QSUnmarshaler) RegisterKindOverride(k reflect.Kind, fn PrimitiveUnmarshalerFunc) error {

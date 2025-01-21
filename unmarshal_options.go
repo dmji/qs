@@ -5,8 +5,8 @@ import (
 	"net/url"
 )
 
-// UnmarshalOptions is used as a parameter by the NewUnmarshaler function.
-type UnmarshalOptions struct {
+// UnmarshalerDefaultOptions is used as a parameter by the NewUnmarshaler function.
+type UnmarshalerDefaultOptions struct {
 	// NameTransformer is used to transform struct field names into a query
 	// string names when they aren't set explicitly in the struct field tag.
 	// If this field is nil then NewUnmarshaler uses a default function that
@@ -45,12 +45,15 @@ type UnmarshalOptions struct {
 	// DefaultUnmarshalPresence is used for the unmarshaling of struct fields
 	// that don't have an explicit UnmarshalPresence option set in their tags.
 	DefaultUnmarshalPresence UnmarshalPresence
+
+	DefaultUnmarshalSliceValues          UnmarshalSliceValues
+	DefaultUnmarshalSliceUnexpectedValue UnmarshalSliceUnexpectedValue
 }
 
 // NewDefaultUnmarshalOptions creates a new UnmarshalOptions in which every field
 // is set to its default value.
-func NewDefaultUnmarshalOptions() *UnmarshalOptions {
-	return prepareUnmarshalOptions(UnmarshalOptions{})
+func NewDefaultUnmarshalOptions() *UnmarshalerDefaultOptions {
+	return prepareUnmarshalOptions(UnmarshalerDefaultOptions{})
 }
 
 // defaultSliceToString is used by the NewUnmarshaler function when
@@ -62,7 +65,7 @@ var defaultSliceToString = func(a []string) (string, error) {
 	return a[0], nil
 }
 
-func prepareUnmarshalOptions(opts UnmarshalOptions) *UnmarshalOptions {
+func prepareUnmarshalOptions(opts UnmarshalerDefaultOptions) *UnmarshalerDefaultOptions {
 	if opts.NameTransformer == nil {
 		opts.NameTransformer = snakeCase
 	}
@@ -83,13 +86,34 @@ func prepareUnmarshalOptions(opts UnmarshalOptions) *UnmarshalOptions {
 	if opts.DefaultUnmarshalPresence == UnmarshalPresenceUPUnspecified {
 		opts.DefaultUnmarshalPresence = UnmarshalPresenceOpt
 	}
+
+	if opts.DefaultUnmarshalSliceValues == UnmarshalSliceValuesUPUnspecified {
+		opts.DefaultUnmarshalSliceValues = UnmarshalSliceValuesOverrideOld
+	}
+
+	if opts.DefaultUnmarshalSliceUnexpectedValue == UnmarshalSliceUnexpectedValueUPUnspecified {
+		opts.DefaultUnmarshalSliceUnexpectedValue = UnmarshalSliceUnexpectedValueBreakWithError
+	}
+
 	return &opts
 }
 
 // option appliers
-func WithUnmarshalPresence(presence UnmarshalPresence) func(*QSUnmarshaler) {
+func WithUnmarshalPresence(value UnmarshalPresence) func(*QSUnmarshaler) {
 	return func(m *QSUnmarshaler) {
-		m.opts.DefaultUnmarshalPresence = presence
+		m.opts.DefaultUnmarshalPresence = value
+	}
+}
+
+func WithUnmarshalSliceValues(value UnmarshalSliceValues) func(*QSUnmarshaler) {
+	return func(m *QSUnmarshaler) {
+		m.opts.DefaultUnmarshalSliceValues = value
+	}
+}
+
+func WithUnmarshalSliceUnexpectedValue(value UnmarshalSliceUnexpectedValue) func(*QSUnmarshaler) {
+	return func(m *QSUnmarshaler) {
+		m.opts.DefaultUnmarshalSliceUnexpectedValue = value
 	}
 }
 
@@ -102,5 +126,35 @@ func WithCustomSliceToStringFunc(fn SliceToStringFunc) func(*QSUnmarshaler) {
 func WithCustomStringToUrlQueryParser(fn func(query string) (url.Values, error)) func(*QSUnmarshaler) {
 	return func(m *QSUnmarshaler) {
 		m.stringToQueryParser = fn
+	}
+}
+
+type UnmarshalOptions struct {
+	UnmarshalerOptions *UnmarshalerDefaultOptions
+	ParsedTagInfo      *ParsedTagInfo
+}
+
+func (o *UnmarshalOptions) NameTransform(s string) string {
+	return o.UnmarshalerOptions.NameTransformer(s)
+}
+
+func (o *UnmarshalOptions) SliceToString(s []string) (string, error) {
+	return o.UnmarshalerOptions.SliceToString(s)
+}
+
+func NewUnmarshalOptions(opt *UnmarshalerDefaultOptions, tag *ParsedTagInfo) *UnmarshalOptions {
+	if tag == nil {
+		tag = &ParsedTagInfo{
+			Name:                          "",
+			MarshalPresence:               MarshalPresenceMPUnspecified,
+			UnmarshalPresence:             opt.DefaultUnmarshalPresence,
+			UnmarshalSliceValues:          opt.DefaultUnmarshalSliceValues,
+			UnmarshalSliceUnexpectedValue: opt.DefaultUnmarshalSliceUnexpectedValue,
+		}
+	}
+
+	return &UnmarshalOptions{
+		UnmarshalerOptions: opt,
+		ParsedTagInfo:      tag,
 	}
 }

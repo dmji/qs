@@ -12,7 +12,7 @@ type fakeValuesUnmarshalerFactory struct {
 	calls []reflect.Type
 }
 
-func (o *fakeValuesUnmarshalerFactory) ValuesUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error) {
+func (o *fakeValuesUnmarshalerFactory) ValuesUnmarshaler(t reflect.Type, opts *UnmarshalerDefaultOptions) (ValuesUnmarshaler, error) {
 	o.calls = append(o.calls, t)
 	return o.u, o.err
 }

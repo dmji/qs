@@ -19,7 +19,7 @@ func newPtrUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (Unmarshaler, err
 		return nil, &WrongKindError{Expected: reflect.Ptr, Actual: t}
 	}
 	et := t.Elem()
-	eu, err := opts.UnmarshalerFactory.Unmarshaler(et, opts)
+	eu, err := opts.UnmarshalerOptions.UnmarshalerFactory.Unmarshaler(et, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func newArrayUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (Unmarshaler, e
 		return nil, &WrongKindError{Expected: reflect.Array, Actual: t}
 	}
 
-	eu, err := opts.UnmarshalerFactory.Unmarshaler(t.Elem(), opts)
+	eu, err := opts.UnmarshalerOptions.UnmarshalerFactory.Unmarshaler(t.Elem(), opts)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func newSliceUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (Unmarshaler, e
 		return nil, &WrongKindError{Expected: reflect.Slice, Actual: t}
 	}
 
-	eu, err := opts.UnmarshalerFactory.Unmarshaler(t.Elem(), opts)
+	eu, err := opts.UnmarshalerOptions.UnmarshalerFactory.Unmarshaler(t.Elem(), opts)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (p *sliceUnmarshaler) Unmarshal(v reflect.Value, a []string, opts *Unmarsha
 	if v.IsNil() {
 		v.Set(reflect.MakeSlice(t, len(a), len(a)))
 	} else {
-		keepPrevValues := false
+		keepPrevValues := opts.ParsedTagInfo.UnmarshalSliceValues == UnmarshalSliceValuesKeepOld
 
 		oldLen := v.Len()
 		newLen := len(a)
@@ -133,14 +133,17 @@ func (p *sliceUnmarshaler) Unmarshal(v reflect.Value, a []string, opts *Unmarsha
 		v.Set(s)
 	}
 
+	breakOnError := opts.ParsedTagInfo.UnmarshalSliceUnexpectedValue == UnmarshalSliceUnexpectedValueBreakWithError
+
 	// unmarshal elements of slice
 	var errLoop error
 	for i := range a {
 		err := p.ElemUnmarshaler.Unmarshal(v.Index(n), a[i:i+1], opts)
 		if err == nil {
 			n++
-		} else if true {
+		} else if breakOnError {
 			errLoop = fmt.Errorf("error unmarshaling slice index %v :: %v", i, err)
+			break
 		}
 	}
 

@@ -25,7 +25,7 @@ func Example_customMarshalerFactory() {
 	customMarshaler.RegisterCustomType(byteSliceType, byteSliceMarshal)
 	customMarshaler.RegisterCustomType(durationType, durationMarshal)
 
-	customUnmarshaler := qs.NewUnmarshaler(&qs.UnmarshalOptions{})
+	customUnmarshaler := qs.NewUnmarshaler(&qs.UnmarshalerDefaultOptions{})
 	customUnmarshaler.RegisterCustomType(byteSliceType, byteSliceUnmarshal)
 	customUnmarshaler.RegisterCustomType(durationType, durationUnmarshal)
 

@@ -5,13 +5,13 @@ import (
 	"reflect"
 )
 
-type ValuesUnmarshalerFactoryFunc func(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error)
+type ValuesUnmarshalerFactoryFunc func(t reflect.Type, opts *UnmarshalerDefaultOptions) (ValuesUnmarshaler, error)
 
 // ValuesUnmarshalerFactory can create ValuesUnmarshaler objects for various types.
 type ValuesUnmarshalerFactory interface {
 	// ValuesUnmarshaler returns a ValuesUnmarshaler object for the given t
 	// type and opts options.
-	ValuesUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error)
+	ValuesUnmarshaler(t reflect.Type, opts *UnmarshalerDefaultOptions) (ValuesUnmarshaler, error)
 
 	// RegisterSubFactory registers a ValuesUnmarshalerFactory for the given kind
 	RegisterSubFactory(k reflect.Kind, fn ValuesUnmarshalerFactoryFunc) error
@@ -22,7 +22,7 @@ type valuesUnmarshalerFactory struct {
 	kindSubRegistriesOverriden map[reflect.Kind]ValuesUnmarshalerFactory
 }
 
-func (p *valuesUnmarshalerFactory) ValuesUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error) {
+func (p *valuesUnmarshalerFactory) ValuesUnmarshaler(t reflect.Type, opts *UnmarshalerDefaultOptions) (ValuesUnmarshaler, error) {
 	if subFactory, ok := p.kindSubRegistriesOverriden[t.Kind()]; ok {
 		return subFactory.ValuesUnmarshaler(t, opts)
 	}
@@ -54,7 +54,7 @@ type valuesUnmarshalerFactoryFunc struct {
 	fn ValuesUnmarshalerFactoryFunc
 }
 
-func (f valuesUnmarshalerFactoryFunc) ValuesUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error) {
+func (f valuesUnmarshalerFactoryFunc) ValuesUnmarshaler(t reflect.Type, opts *UnmarshalerDefaultOptions) (ValuesUnmarshaler, error) {
 	return f.fn(t, opts)
 }
 

@@ -24,7 +24,7 @@ func Example_customMarshalerFactory() {
 	customMarshaler := qs.NewMarshaler(&qs.MarshalOptions{
 		MarshalerFactory: &marshalerFactory{qs.NewDefaultMarshalOptions().MarshalerFactory},
 	})
-	customUnmarshaler := qs.NewUnmarshaler(&qs.UnmarshalOptions{
+	customUnmarshaler := qs.NewUnmarshaler(&qs.UnmarshalerDefaultOptions{
 		UnmarshalerFactory: &unmarshalerFactory{qs.NewDefaultUnmarshalOptions().UnmarshalerFactory},
 	})
 

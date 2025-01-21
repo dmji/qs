@@ -1,11 +1,11 @@
 package qs
 
-//go:generate go-stringer -type=UnmarshalPresence --trimprefix=UnmarshalPresence -output unmarshal_string.go -nametransform=lower -fromstringgenfn
+//go:generate go run github.com/dmji/go-stringer@latest -type=UnmarshalPresence,UnmarshalSliceValues,UnmarshalSliceUnexpectedValue --trimprefix=@me -output unmarshal_string.go -nametransform=lower -fromstringgenfn
 
 // UnmarshalPresence is an enum that controls the unmarshaling of fields.
 // This option is used by the unmarshaler only if the given field isn't present
 // in the query string or url.Values that is being unmarshaled.
-type UnmarshalPresence int
+type UnmarshalPresence int8
 
 const (
 	// UnmarshalPresenceUPUnspecified is the zero value of UnmarshalPresence. In most cases
@@ -31,4 +31,20 @@ const (
 	// Nil option instead with nil pointers and nil arrays to be able to detect
 	// missing fields after unmarshaling.
 	UnmarshalPresenceReq
+)
+
+type UnmarshalSliceValues int8
+
+const (
+	UnmarshalSliceValuesUPUnspecified UnmarshalSliceValues = iota
+	UnmarshalSliceValuesKeepOld
+	UnmarshalSliceValuesOverrideOld
+)
+
+type UnmarshalSliceUnexpectedValue int8
+
+const (
+	UnmarshalSliceUnexpectedValueUPUnspecified UnmarshalSliceUnexpectedValue = iota
+	UnmarshalSliceUnexpectedValueBreakWithError
+	UnmarshalSliceUnexpectedValueSkip
 )

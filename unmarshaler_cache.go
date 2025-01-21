@@ -16,7 +16,7 @@ type valuesUnmarshalerCache struct {
 	cache   sync.Map
 }
 
-func (o *valuesUnmarshalerCache) ValuesUnmarshaler(t reflect.Type, opts *UnmarshalOptions) (ValuesUnmarshaler, error) {
+func (o *valuesUnmarshalerCache) ValuesUnmarshaler(t reflect.Type, opts *UnmarshalerDefaultOptions) (ValuesUnmarshaler, error) {
 	return cacher(o.wrapped.ValuesUnmarshaler, &o.cache, t, opts)
 }
 
@@ -41,12 +41,10 @@ func (o *unmarshalerCache) Unmarshaler(t reflect.Type, opts *UnmarshalOptions) (
 
 func (p *unmarshalerCache) RegisterSubFactory(k reflect.Kind, fn UnmarshalerFactoryFunc) error {
 	return p.wrapped.RegisterSubFactory(k, fn)
-
 }
 
 func (p *unmarshalerCache) RegisterCustomType(k reflect.Type, fn PrimitiveUnmarshalerFunc) error {
 	return p.wrapped.RegisterCustomType(k, fn)
-
 }
 
 func (p *unmarshalerCache) RegisterKindOverride(k reflect.Kind, fn PrimitiveUnmarshalerFunc) error {
